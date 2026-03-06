@@ -89,12 +89,132 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface CartItem {
+    productId: bigint;
+    productName: string;
+    quantity: bigint;
+    price: number;
+}
+export interface Review {
+    reviewText: string;
+    productId: bigint;
+    reviewerName: string;
+    timestamp: bigint;
+    rating: bigint;
+}
+export interface OrderView {
+    customerName: string;
+    status: string;
+    paymentMethod: string;
+    city: string;
+    email: string;
+    orderId: bigint;
+    cartItems: Array<CartItem>;
+    state: string;
+    address: string;
+    phone: string;
+    pincode: string;
+}
 export interface backendInterface {
+    addToCart(sessionId: string, productId: bigint, productName: string, price: number, quantity: bigint): Promise<void>;
+    clearCart(sessionId: string): Promise<void>;
+    getAverageRating(productId: bigint): Promise<number>;
+    getCart(sessionId: string): Promise<Array<CartItem>>;
+    getOrder(orderId: bigint): Promise<OrderView | null>;
+    getReviews(productId: bigint): Promise<Array<Review>>;
     getSubscriberCount(): Promise<bigint>;
+    placeOrder(sessionId: string, customerName: string, email: string, phone: string, address: string, city: string, state: string, pincode: string, paymentMethod: string): Promise<bigint>;
+    removeFromCart(sessionId: string, productId: bigint): Promise<void>;
+    submitReview(productId: bigint, rating: bigint, reviewText: string, reviewerName: string): Promise<void>;
     subscribe(email: string): Promise<void>;
 }
+import type { OrderView as _OrderView } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
+    async addToCart(arg0: string, arg1: bigint, arg2: string, arg3: number, arg4: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addToCart(arg0, arg1, arg2, arg3, arg4);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addToCart(arg0, arg1, arg2, arg3, arg4);
+            return result;
+        }
+    }
+    async clearCart(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.clearCart(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.clearCart(arg0);
+            return result;
+        }
+    }
+    async getAverageRating(arg0: bigint): Promise<number> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAverageRating(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAverageRating(arg0);
+            return result;
+        }
+    }
+    async getCart(arg0: string): Promise<Array<CartItem>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCart(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCart(arg0);
+            return result;
+        }
+    }
+    async getOrder(arg0: bigint): Promise<OrderView | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getOrder(arg0);
+                return from_candid_opt_n1(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getOrder(arg0);
+            return from_candid_opt_n1(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getReviews(arg0: bigint): Promise<Array<Review>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getReviews(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getReviews(arg0);
+            return result;
+        }
+    }
     async getSubscriberCount(): Promise<bigint> {
         if (this.processError) {
             try {
@@ -106,6 +226,48 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getSubscriberCount();
+            return result;
+        }
+    }
+    async placeOrder(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string, arg5: string, arg6: string, arg7: string, arg8: string): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.placeOrder(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.placeOrder(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+            return result;
+        }
+    }
+    async removeFromCart(arg0: string, arg1: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.removeFromCart(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.removeFromCart(arg0, arg1);
+            return result;
+        }
+    }
+    async submitReview(arg0: bigint, arg1: bigint, arg2: string, arg3: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitReview(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitReview(arg0, arg1, arg2, arg3);
             return result;
         }
     }
@@ -123,6 +285,9 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+}
+function from_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_OrderView]): OrderView | null {
+    return value.length === 0 ? null : value[0];
 }
 export interface CreateActorOptions {
     agent?: Agent;

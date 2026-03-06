@@ -8,16 +8,124 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const CartItem = IDL.Record({
+  'productId' : IDL.Nat,
+  'productName' : IDL.Text,
+  'quantity' : IDL.Nat,
+  'price' : IDL.Float64,
+});
+export const OrderView = IDL.Record({
+  'customerName' : IDL.Text,
+  'status' : IDL.Text,
+  'paymentMethod' : IDL.Text,
+  'city' : IDL.Text,
+  'email' : IDL.Text,
+  'orderId' : IDL.Nat,
+  'cartItems' : IDL.Vec(CartItem),
+  'state' : IDL.Text,
+  'address' : IDL.Text,
+  'phone' : IDL.Text,
+  'pincode' : IDL.Text,
+});
+export const Review = IDL.Record({
+  'reviewText' : IDL.Text,
+  'productId' : IDL.Nat,
+  'reviewerName' : IDL.Text,
+  'timestamp' : IDL.Int,
+  'rating' : IDL.Nat,
+});
+
 export const idlService = IDL.Service({
+  'addToCart' : IDL.Func(
+      [IDL.Text, IDL.Nat, IDL.Text, IDL.Float64, IDL.Nat],
+      [],
+      [],
+    ),
+  'clearCart' : IDL.Func([IDL.Text], [], []),
+  'getAverageRating' : IDL.Func([IDL.Nat], [IDL.Float64], ['query']),
+  'getCart' : IDL.Func([IDL.Text], [IDL.Vec(CartItem)], ['query']),
+  'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(OrderView)], ['query']),
+  'getReviews' : IDL.Func([IDL.Nat], [IDL.Vec(Review)], ['query']),
   'getSubscriberCount' : IDL.Func([], [IDL.Nat], ['query']),
+  'placeOrder' : IDL.Func(
+      [
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+      ],
+      [IDL.Nat],
+      [],
+    ),
+  'removeFromCart' : IDL.Func([IDL.Text, IDL.Nat], [], []),
+  'submitReview' : IDL.Func([IDL.Nat, IDL.Nat, IDL.Text, IDL.Text], [], []),
   'subscribe' : IDL.Func([IDL.Text], [], []),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const CartItem = IDL.Record({
+    'productId' : IDL.Nat,
+    'productName' : IDL.Text,
+    'quantity' : IDL.Nat,
+    'price' : IDL.Float64,
+  });
+  const OrderView = IDL.Record({
+    'customerName' : IDL.Text,
+    'status' : IDL.Text,
+    'paymentMethod' : IDL.Text,
+    'city' : IDL.Text,
+    'email' : IDL.Text,
+    'orderId' : IDL.Nat,
+    'cartItems' : IDL.Vec(CartItem),
+    'state' : IDL.Text,
+    'address' : IDL.Text,
+    'phone' : IDL.Text,
+    'pincode' : IDL.Text,
+  });
+  const Review = IDL.Record({
+    'reviewText' : IDL.Text,
+    'productId' : IDL.Nat,
+    'reviewerName' : IDL.Text,
+    'timestamp' : IDL.Int,
+    'rating' : IDL.Nat,
+  });
+  
   return IDL.Service({
+    'addToCart' : IDL.Func(
+        [IDL.Text, IDL.Nat, IDL.Text, IDL.Float64, IDL.Nat],
+        [],
+        [],
+      ),
+    'clearCart' : IDL.Func([IDL.Text], [], []),
+    'getAverageRating' : IDL.Func([IDL.Nat], [IDL.Float64], ['query']),
+    'getCart' : IDL.Func([IDL.Text], [IDL.Vec(CartItem)], ['query']),
+    'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(OrderView)], ['query']),
+    'getReviews' : IDL.Func([IDL.Nat], [IDL.Vec(Review)], ['query']),
     'getSubscriberCount' : IDL.Func([], [IDL.Nat], ['query']),
+    'placeOrder' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+        ],
+        [IDL.Nat],
+        [],
+      ),
+    'removeFromCart' : IDL.Func([IDL.Text, IDL.Nat], [], []),
+    'submitReview' : IDL.Func([IDL.Nat, IDL.Nat, IDL.Text, IDL.Text], [], []),
     'subscribe' : IDL.Func([IDL.Text], [], []),
   });
 };

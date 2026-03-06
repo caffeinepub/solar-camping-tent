@@ -7,6 +7,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Toaster } from "@/components/ui/sonner";
+import {
+  Outlet,
+  RouterProvider,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  useNavigate,
+} from "@tanstack/react-router";
 import {
   Battery,
   Check,
@@ -26,7 +35,21 @@ import {
   Zap,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Footer from "./components/Footer";
+import Navbar from "./components/Navbar";
+import WhatsAppButton from "./components/WhatsAppButton";
+import { CartProvider } from "./contexts/CartContext";
 import { useActor } from "./hooks/useActor";
+import AboutPage from "./pages/AboutPage";
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import ContactPage from "./pages/ContactPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import ProductPage from "./pages/ProductPage";
+import ReturnsPage from "./pages/ReturnsPage";
+import ShippingPage from "./pages/ShippingPage";
+import ShopPage from "./pages/ShopPage";
+import TermsPage from "./pages/TermsPage";
 
 /* ─── Scroll Animation Hook ─────────────────────────────────── */
 function useFadeInUp() {
@@ -51,135 +74,9 @@ function useFadeInUp() {
   return ref;
 }
 
-/* ─── Navbar ─────────────────────────────────────────────────── */
-function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
-
-  const navLinks = [
-    { label: "Features", href: "#features" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Gallery", href: "#gallery" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "FAQ", href: "#faq" },
-  ];
-
-  return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/90 backdrop-blur-md shadow-xs border-b border-earth-dark"
-          : "bg-transparent"
-      }`}
-    >
-      <nav className="container max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
-        {/* Logo */}
-        <a
-          href="#hero"
-          className="flex items-center gap-2 group"
-          data-ocid="nav.link"
-        >
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-brand shadow-amber">
-            <Sun className="w-4 h-4 text-white" strokeWidth={2.5} />
-          </span>
-          <span
-            className={`font-display font-black text-xl tracking-tight transition-colors ${
-              scrolled ? "text-forest-dark" : "text-white"
-            }`}
-          >
-            SolarTent
-          </span>
-        </a>
-
-        {/* Desktop nav */}
-        <ul className="hidden md:flex items-center gap-6">
-          {navLinks.map((link, i) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                data-ocid={`nav.link.${i + 1}`}
-                className={`text-sm font-semibold tracking-wide transition-colors hover:text-amber-brand ${
-                  scrolled ? "text-foreground" : "text-white/90"
-                }`}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        {/* Desktop CTA */}
-        <a
-          href="#pricing"
-          className="hidden md:block"
-          data-ocid="nav.primary_button"
-        >
-          <Button className="btn-amber-stamp bg-amber-brand text-accent-foreground hover:bg-amber-dark font-bold px-5 transition-all duration-150 active:scale-[0.98]">
-            Shop Now
-          </Button>
-        </a>
-
-        {/* Mobile hamburger */}
-        <button
-          type="button"
-          className="md:hidden p-2 rounded-md transition-colors"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label="Toggle menu"
-          data-ocid="nav.toggle"
-        >
-          {mobileOpen ? (
-            <X
-              className={`w-6 h-6 ${scrolled ? "text-foreground" : "text-white"}`}
-            />
-          ) : (
-            <Menu
-              className={`w-6 h-6 ${scrolled ? "text-foreground" : "text-white"}`}
-            />
-          )}
-        </button>
-      </nav>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden bg-white border-b border-earth-dark shadow-nature px-4 pb-6 pt-2">
-          <ul className="flex flex-col gap-1 mb-4">
-            {navLinks.map((link, i) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  data-ocid={`nav.link.${i + 1}`}
-                  className="block py-2.5 px-3 rounded-md text-foreground font-semibold hover:bg-earth transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <Button
-            className="w-full btn-amber-stamp bg-amber-brand text-accent-foreground hover:bg-amber-dark font-bold active:scale-[0.98]"
-            data-ocid="nav.primary_button"
-            onClick={() => {
-              setMobileOpen(false);
-              window.location.hash = "#pricing";
-            }}
-          >
-            Shop Now
-          </Button>
-        </div>
-      )}
-    </header>
-  );
-}
-
 /* ─── Hero ───────────────────────────────────────────────────── */
 function Hero() {
+  const navigate = useNavigate();
   return (
     <section
       id="hero"
@@ -229,36 +126,35 @@ function Hero() {
 
         <p className="text-white/80 text-lg sm:text-xl font-medium max-w-xl mx-auto mb-10 leading-relaxed tracking-wide">
           The world&apos;s smartest camping tent with built-in solar charging.
+          Made for India&apos;s adventurers.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <a href="#pricing">
-            <Button
-              size="lg"
-              data-ocid="hero.primary_button"
-              className="btn-amber-stamp bg-amber-brand hover:bg-amber-dark text-accent-foreground font-black text-base px-9 py-6 transition-all duration-150 active:scale-[0.98]"
-            >
-              Shop Now
-            </Button>
-          </a>
-          <a href="#pricing">
-            <Button
-              size="lg"
-              variant="outline"
-              data-ocid="hero.secondary_button"
-              className="border-2 border-white/70 text-white bg-white/5 hover:bg-white/15 hover:border-white font-bold text-base px-9 py-6 transition-all duration-150 active:scale-[0.98] backdrop-blur-sm"
-            >
-              Buy Solar Tent
-            </Button>
-          </a>
+          <Button
+            size="lg"
+            data-ocid="hero.primary_button"
+            onClick={() => navigate({ to: "/shop" })}
+            className="btn-amber-stamp bg-amber-brand hover:bg-amber-dark text-accent-foreground font-black text-base px-9 py-6 transition-all duration-150 active:scale-[0.98]"
+          >
+            Shop Now
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            data-ocid="hero.secondary_button"
+            onClick={() => navigate({ to: "/product/solar-camping-tent" })}
+            className="border-2 border-white/70 text-white bg-white/5 hover:bg-white/15 hover:border-white font-bold text-base px-9 py-6 transition-all duration-150 active:scale-[0.98] backdrop-blur-sm"
+          >
+            View Solar Tent
+          </Button>
         </div>
 
         {/* Stats bar */}
         <div className="mt-14 inline-flex flex-wrap gap-0 justify-center rounded-2xl bg-white/8 border border-white/12 backdrop-blur-sm overflow-hidden divide-x divide-white/10">
           {[
-            { value: "30W", label: "Solar Output" },
-            { value: "10,000", label: "mAh Battery" },
-            { value: "2.1 kg", label: "Total Weight" },
+            { value: "1W", label: "Solar Panel" },
+            { value: "1.8kg", label: "Total Weight" },
+            { value: "₹5,999", label: "Launch Price" },
             { value: "60s", label: "Setup Time" },
           ].map((stat) => (
             <div key={stat.label} className="text-center px-6 py-4">
@@ -285,33 +181,33 @@ function Hero() {
 const benefits = [
   {
     icon: Sun,
-    title: "Built-in Solar Panels",
-    desc: "Integrated 30W flexible solar cells charge your gear all day, even in partial shade.",
+    title: "Built-in Solar Panel",
+    desc: "1W monocrystalline solar panel charges your phone directly from sunlight. No power banks required.",
   },
   {
     icon: CloudRain,
-    title: "IPX4 Weather Resistant",
-    desc: "Engineered to withstand rain, wind, and harsh conditions so you're always protected.",
+    title: "2000mm Waterproof",
+    desc: "Engineered to withstand India's heaviest monsoon rains. Rated 2000mm HH with taped seams.",
   },
   {
     icon: Zap,
     title: "60-Second Setup",
-    desc: "Color-coded poles and intuitive design get you shelter in under a minute.",
+    desc: "Color-coded poles and intuitive design get you shelter in under a minute — even in the dark.",
   },
   {
     icon: Usb,
-    title: "Dual USB-C Ports",
-    desc: "Power your phone, headlamp, GPS, and more from inside the tent simultaneously.",
+    title: "Universal USB Charging",
+    desc: "Standard USB-A port inside the tent charges phones, GPS devices, headlamps, and cameras.",
   },
   {
     icon: Feather,
     title: "Ultra-Lightweight",
-    desc: "Only 2.1 kg. Built with aerospace-grade ripstop fabric for trail-tested durability.",
+    desc: "Only 1.8 kg. Built with 210D ripstop nylon — trail-tested across Himalayan altitudes.",
   },
   {
     icon: Battery,
-    title: "48h Off-Grid Power",
-    desc: "10,000 mAh internal battery keeps your devices running for days on end.",
+    title: "1-Year Warranty",
+    desc: "Manufacturing defect warranty on tent body, poles, and solar panel. Real support from real adventurers.",
   },
 ];
 
@@ -324,7 +220,7 @@ function Benefits() {
         <div className="fade-in-up" ref={ref}>
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-black tracking-[0.2em] uppercase text-amber-brand mb-3">
-              Why SolarTent
+              Why SunCamp Gear
             </span>
             <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-foreground leading-tight mb-4">
               Built for the Wilderness.{" "}
@@ -370,19 +266,19 @@ const steps = [
     num: "01",
     icon: Sun,
     title: "Collect",
-    desc: "Integrated 30W flexible solar panels absorb sunlight throughout the day, maximising every ray.",
+    desc: "The integrated 1W monocrystalline solar panel on the rain fly absorbs sunlight throughout the day.",
   },
   {
     num: "02",
     icon: Battery,
-    title: "Store",
-    desc: "Energy flows into the built-in 10,000 mAh smart battery with intelligent charge management.",
+    title: "Convert",
+    desc: "Solar energy converts to DC electricity and routes via weatherproof cable to the USB port inside.",
   },
   {
     num: "03",
     icon: Zap,
-    title: "Power",
-    desc: "Charge any device via dual USB-C fast-charge ports directly from inside your tent.",
+    title: "Charge",
+    desc: "Plug in your phone, GPS, or headlamp via standard USB-A. Full phone charge in 2–3 hours of sun.",
   },
 ];
 
@@ -449,12 +345,12 @@ function HowItWorks() {
             {/* Decorative glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-amber-brand/10 rounded-full blur-3xl pointer-events-none" />
             <p className="relative text-white/90 text-lg sm:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
-              On a full sunny day, the SolarTent generates enough power to fully
-              charge a smartphone{" "}
+              In 6–8 hours of direct Indian summer sun, the SunCamp Solo
+              generates enough power to fully charge a smartphone{" "}
               <strong className="text-amber-brand font-black">
-                5 times over
+                once completely
               </strong>{" "}
-              — while keeping the battery topped for cloudy days.
+              — while you&apos;re out on the trail, nature does the work.
             </p>
           </div>
         </div>
@@ -555,36 +451,36 @@ function Gallery() {
 /* ─── Testimonials ───────────────────────────────────────────── */
 const testimonials = [
   {
-    name: "Sarah K.",
-    role: "Thru-Hiker, PCT",
-    initials: "SK",
+    name: "Rohit Sharma",
+    role: "Himachal Trek, Hampta Pass",
+    initials: "RS",
     stars: 5,
     quote:
-      "Absolutely game-changing. I hiked the PCT and never ran out of battery. The setup is incredibly fast and the solar charging actually works — even on overcast Pacific Northwest days.",
+      "Took this to Hampta Pass. By day 2, every other trekker's phone was dead — mine had 80% battery. The solar charging actually works. Absolutely game-changing for Himalayan treks.",
   },
   {
-    name: "Marcus R.",
-    role: "Mountain Biker, Moab",
-    initials: "MR",
+    name: "Priya Nair",
+    role: "Solo Trekker, Western Ghats",
+    initials: "PN",
     stars: 5,
     quote:
-      "Packed it into Moab for a week. Charged my GPS, lights, and camera every single day. The IPX4 rating held up flawlessly in a surprise thunderstorm on day four.",
+      "As a solo female trekker, having a charged phone for emergencies is non-negotiable. This tent solved that problem completely. Waterproofing held through a Western Ghats monsoon day.",
   },
   {
-    name: "Priya M.",
-    role: "Solo Backcountry Traveler",
-    initials: "PM",
+    name: "Arjun Mehta",
+    role: "Trail Runner, Uttarakhand",
+    initials: "AM",
     stars: 5,
     quote:
-      "Lightweight enough for solo backcountry trips. The dual USB-C ports mean I can charge two devices simultaneously — a game changer when you're deep in the wilderness.",
+      "1.8 kg is light enough for my fast-and-light style. Set up in under 60 seconds — timed it. The build quality is premium and the solar panel actually delivers.",
   },
   {
-    name: "Tom & Julia B.",
-    role: "Couple Campers",
-    initials: "TB",
+    name: "Ananya Bose",
+    role: "Weekend Camper, Coorg",
+    initials: "AB",
     stars: 4,
     quote:
-      "We upgraded from a basic tent and the difference is night and day. The battery lasted 2 full days during an overcast weekend — exceeded our expectations entirely.",
+      "Weekend camping in Coorg — tent was perfect. Charged my phone and camera battery over the weekend. The setup instructions are super clear. Great value at ₹5,999.",
   },
 ];
 
@@ -617,7 +513,7 @@ function Testimonials() {
             </span>
             <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-foreground leading-tight">
               Trusted by <span className="text-forest italic">Adventurers</span>{" "}
-              Worldwide
+              Across India
             </h2>
           </div>
 
@@ -670,55 +566,56 @@ const pricingTiers: PricingTier[] = [
   {
     id: "solo",
     name: "Solo",
-    price: "$299",
+    price: "₹5,999",
     ocid: "pricing.item.1",
     btnOcid: "pricing.solo.button",
     features: [
       "1-person capacity",
-      "20W solar panel",
-      "6,000 mAh battery",
-      "1× USB-C port",
-      "IPX4 weather rating",
+      "1W solar panel",
+      "USB-A charging port",
+      "2000mm waterproof",
+      "1.8 kg total weight",
       "1-year warranty",
     ],
   },
   {
     id: "duo",
     name: "Duo",
-    price: "$449",
+    price: "₹8,999",
     recommended: true,
     ocid: "pricing.item.2",
     btnOcid: "pricing.duo.button",
     features: [
       "2-person capacity",
-      "30W solar panel",
-      "10,000 mAh battery",
-      "2× USB-C ports",
-      "IPX4 weather rating",
+      "2W solar panel",
+      "2× USB-A ports",
+      "2000mm waterproof",
+      "2.4 kg total weight",
       "Free stuff sack included",
-      "2-year warranty",
+      "1-year warranty",
     ],
   },
   {
     id: "family",
-    name: "Family",
-    price: "$599",
+    name: "Pro",
+    price: "₹12,999",
     ocid: "pricing.item.3",
-    btnOcid: "pricing.family.button",
+    btnOcid: "pricing.pro.button",
     features: [
-      "4-person capacity",
-      "40W solar panel",
-      "15,000 mAh battery",
-      "4× USB-C ports",
-      "IPX6 weather rating",
+      "2-person capacity",
+      "5W solar panel + 10000mAh battery",
+      "3× USB-A ports",
+      "2000mm waterproof + IPX6 fly",
+      "LED interior lighting",
       "Free footprint + stuff sack",
-      "3-year warranty + lifetime support",
+      "1-year warranty",
     ],
   },
 ];
 
 function Pricing() {
   const ref = useFadeInUp();
+  const navigate = useNavigate();
 
   return (
     <section
@@ -732,10 +629,11 @@ function Pricing() {
               Pricing
             </span>
             <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-foreground leading-tight">
-              Choose Your <span className="text-forest italic">Adventure</span>
+              Choose Your <span className="text-forest italic">Solar Tent</span>
             </h2>
             <p className="text-muted-foreground text-lg mt-4">
-              Every tier ships with free domestic delivery and a 30-day trial.
+              Free delivery across India. 7-day returns. 1-year warranty on
+              every tent.
             </p>
           </div>
 
@@ -763,7 +661,7 @@ function Pricing() {
                     {tier.name}
                   </h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="font-display font-black text-5xl text-foreground">
+                    <span className="font-display font-black text-4xl text-foreground">
                       {tier.price}
                     </span>
                     <span className="text-muted-foreground text-sm">
@@ -791,6 +689,12 @@ function Pricing() {
                 <Button
                   data-ocid={tier.btnOcid}
                   size="lg"
+                  onClick={() =>
+                    navigate({
+                      to: "/checkout",
+                      search: { plan: tier.id },
+                    })
+                  }
                   className={`w-full font-bold transition-all duration-150 active:scale-[0.98] ${
                     tier.recommended
                       ? "btn-amber-stamp bg-amber-brand hover:bg-amber-dark text-accent-foreground"
@@ -811,32 +715,32 @@ function Pricing() {
 /* ─── FAQ ─────────────────────────────────────────────────────── */
 const faqs = [
   {
-    q: "How long does the battery take to fully charge?",
-    a: "In direct sunlight, the 10,000 mAh battery charges fully in approximately 4–6 hours. The 30W solar panel is optimised for efficiency even in partial cloud cover.",
+    q: "How long does it take to charge a phone?",
+    a: "In direct sunlight, a 4000mAh smartphone charges in approximately 2–3 hours from 0–100%. In partial shade or cloudy conditions, expect longer charging times.",
   },
   {
-    q: "What is the weather resistance rating?",
-    a: "The Solar Tent is rated IPX4, meaning it can withstand splashing water from any direction. The Family tier is IPX6, offering full protection against heavy rain and wind-driven rain.",
+    q: "Is it suitable for India's monsoon season?",
+    a: "Yes. The SunCamp Solo has a 2000mm waterproof head rating with factory-taped seams. We've tested it in Coorg and Kodaikanal during peak monsoon — it stays bone dry inside.",
   },
   {
     q: "How fast is the setup really?",
-    a: "Most users set up the tent in under 60 seconds using our colour-coded pole system. Our instructional guide and video tutorial are included with every purchase.",
+    a: "Under 60 seconds with the color-coded pole system. Most customers master it in under 30 seconds by the second or third time. A quick setup video is included with every purchase.",
+  },
+  {
+    q: "Does it work on cloudy or overcast days?",
+    a: "Yes, at reduced efficiency — expect 20–30% capacity on overcast days. On bright cloudy days (common in Indian hill stations), you'll still generate useful charge.",
   },
   {
     q: "What devices can I charge?",
-    a: "Any device with a USB-C connection: smartphones, tablets, GPS devices, headlamps, cameras, and portable speakers. The dual 18W fast-charge ports support all major device brands.",
+    a: "Any device with a USB-A cable: smartphones, GPS trackers, headlamps, cameras, Bluetooth speakers, and smart watches. Works with all major brands including iPhone (with cable), Android, and GPS devices.",
   },
   {
-    q: "Can the solar panels be used in cold weather?",
-    a: "Yes. The flexible photovoltaic cells operate efficiently from −20°C to 60°C. Performance may reduce slightly in extreme cold, but the insulated battery maintains charge well.",
+    q: "What is the return policy?",
+    a: "7-day returns from delivery date on all unused, unused items in original packaging. Defective items are replaced or refunded at no cost at any time during the 1-year warranty period.",
   },
   {
-    q: "What happens on cloudy days?",
-    a: "The panels still generate power in diffuse light, typically at 20–30% efficiency. The built-in battery stores enough energy from previous sunny days to keep you powered for up to 48 hours.",
-  },
-  {
-    q: "What does the warranty cover?",
-    a: "Solo comes with a 1-year warranty, Duo with 2 years, and Family with 3 years plus lifetime customer support. We cover manufacturing defects and panel degradation beyond 20%.",
+    q: "Does it come with a warranty?",
+    a: "Yes — 1-year manufacturing defect warranty covering tent body, poles, seams, zipper, and the solar panel. Real support via WhatsApp and email, Mon–Sat 9AM–7PM.",
   },
 ];
 
@@ -921,12 +825,12 @@ function Newsletter() {
           </div>
 
           <h2 className="font-display text-4xl sm:text-5xl font-black text-white leading-tight mb-4">
-            Join 50,000+ Outdoor{" "}
-            <span className="text-amber-brand italic">Enthusiasts</span>
+            Join India&apos;s Solar{" "}
+            <span className="text-amber-brand italic">Adventure Community</span>
           </h2>
           <p className="text-white/75 text-lg mb-10 leading-relaxed">
-            Get exclusive gear tips, new product launches, and adventure
-            inspiration straight to your inbox.
+            Get exclusive deals, trekking tips, and gear launches — straight to
+            your inbox.
           </p>
 
           {status === "success" ? (
@@ -989,109 +893,13 @@ function Newsletter() {
   );
 }
 
-/* ─── Footer ─────────────────────────────────────────────────── */
-const footerLinks = {
-  Product: ["Features", "How It Works", "Gallery", "Pricing"],
-  Support: ["FAQ", "Contact", "Warranty", "Returns"],
-  Company: ["About", "Blog", "Careers", "Press"],
-};
+/* ─── HomePage ───────────────────────────────────────────────── */
+function HomePage() {
+  useEffect(() => {
+    document.title =
+      "SunCamp Gear - Solar Powered Camping Tents | Smart Outdoor Adventure";
+  }, []);
 
-const footerAnchors: Record<string, string> = {
-  Features: "#features",
-  "How It Works": "#how-it-works",
-  Gallery: "#gallery",
-  Pricing: "#pricing",
-  FAQ: "#faq",
-};
-
-function Footer() {
-  const currentYear = new Date().getFullYear();
-  const hostname =
-    typeof window !== "undefined" ? window.location.hostname : "";
-  const caffeineUrl = `https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`;
-
-  let ocidCounter = 0;
-
-  return (
-    <footer className="bg-forest-dark text-white/85 pt-16 pb-8">
-      <div className="container max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-14">
-          {/* Brand col */}
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full bg-amber-brand flex items-center justify-center shadow-amber">
-                <Sun className="w-4 h-4 text-white" strokeWidth={2.5} />
-              </div>
-              <span className="font-display font-black text-xl text-white">
-                SolarTent
-              </span>
-            </div>
-            <p className="text-white/55 text-sm leading-relaxed mb-6">
-              Power Your Adventure. Anywhere.
-            </p>
-            <div className="flex gap-4">
-              {[
-                { icon: Twitter, label: "Twitter" },
-                { icon: Instagram, label: "Instagram" },
-                { icon: Youtube, label: "YouTube" },
-                { icon: Facebook, label: "Facebook" },
-              ].map(({ icon: Icon, label }) => (
-                <a
-                  key={label}
-                  href={`https://www.${label.toLowerCase()}.com`}
-                  aria-label={label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center hover:bg-amber-brand hover:text-accent-foreground transition-colors duration-200"
-                  data-ocid={`footer.link.${++ocidCounter}`}
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Link columns */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h4 className="font-black text-white text-sm tracking-widest uppercase mb-4">
-                {category}
-              </h4>
-              <ul className="space-y-2.5">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href={footerAnchors[link] ?? "#"}
-                      data-ocid={`footer.link.${++ocidCounter}`}
-                      className="text-white/55 text-sm hover:text-amber-brand transition-colors duration-200"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 text-white/40 text-xs">
-          <p>© {currentYear} SolarTent. All rights reserved.</p>
-          <a
-            href={caffeineUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-amber-brand transition-colors duration-200"
-          >
-            Built with ♥ using caffeine.ai
-          </a>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-/* ─── App ─────────────────────────────────────────────────────── */
-export default function App() {
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -1106,6 +914,163 @@ export default function App() {
         <Newsletter />
       </main>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
+}
+
+/* ─── Layout Wrapper (for pages with standard Navbar/Footer) ─── */
+function PageLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen">
+      <Navbar />
+      <main>{children}</main>
+      <Footer />
+      <WhatsAppButton />
+    </div>
+  );
+}
+
+/* ─── Router Setup ───────────────────────────────────────────── */
+const rootRoute = createRootRoute({
+  component: () => (
+    <CartProvider>
+      <Outlet />
+      <Toaster richColors position="top-right" />
+    </CartProvider>
+  ),
+});
+
+const homeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: HomePage,
+});
+
+const checkoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/checkout",
+  component: () => (
+    <>
+      <CheckoutPage />
+      <WhatsAppButton />
+    </>
+  ),
+});
+
+const shopRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/shop",
+  component: () => (
+    <PageLayout>
+      <ShopPage />
+    </PageLayout>
+  ),
+});
+
+const productRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/product/solar-camping-tent",
+  component: () => (
+    <PageLayout>
+      <ProductPage />
+    </PageLayout>
+  ),
+});
+
+const aboutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/about",
+  component: () => (
+    <PageLayout>
+      <AboutPage />
+    </PageLayout>
+  ),
+});
+
+const contactRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/contact",
+  component: () => (
+    <PageLayout>
+      <ContactPage />
+    </PageLayout>
+  ),
+});
+
+const shippingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/shipping",
+  component: () => (
+    <PageLayout>
+      <ShippingPage />
+    </PageLayout>
+  ),
+});
+
+const returnsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/returns",
+  component: () => (
+    <PageLayout>
+      <ReturnsPage />
+    </PageLayout>
+  ),
+});
+
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/privacy",
+  component: () => (
+    <PageLayout>
+      <PrivacyPage />
+    </PageLayout>
+  ),
+});
+
+const termsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/terms",
+  component: () => (
+    <PageLayout>
+      <TermsPage />
+    </PageLayout>
+  ),
+});
+
+const cartRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/cart",
+  component: () => (
+    <PageLayout>
+      <CartPage />
+    </PageLayout>
+  ),
+});
+
+const routeTree = rootRoute.addChildren([
+  homeRoute,
+  checkoutRoute,
+  shopRoute,
+  productRoute,
+  aboutRoute,
+  contactRoute,
+  shippingRoute,
+  returnsRoute,
+  privacyRoute,
+  termsRoute,
+  cartRoute,
+]);
+
+const router = createRouter({ routeTree });
+
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
+}
+
+/* ─── App ─────────────────────────────────────────────────────── */
+export default function App() {
+  return <RouterProvider router={router} />;
 }

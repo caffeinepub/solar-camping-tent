@@ -10,8 +10,49 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface CartItem {
+  'productId' : bigint,
+  'productName' : string,
+  'quantity' : bigint,
+  'price' : number,
+}
+export interface OrderView {
+  'customerName' : string,
+  'status' : string,
+  'paymentMethod' : string,
+  'city' : string,
+  'email' : string,
+  'orderId' : bigint,
+  'cartItems' : Array<CartItem>,
+  'state' : string,
+  'address' : string,
+  'phone' : string,
+  'pincode' : string,
+}
+export interface Review {
+  'reviewText' : string,
+  'productId' : bigint,
+  'reviewerName' : string,
+  'timestamp' : bigint,
+  'rating' : bigint,
+}
 export interface _SERVICE {
+  'addToCart' : ActorMethod<
+    [string, bigint, string, number, bigint],
+    undefined
+  >,
+  'clearCart' : ActorMethod<[string], undefined>,
+  'getAverageRating' : ActorMethod<[bigint], number>,
+  'getCart' : ActorMethod<[string], Array<CartItem>>,
+  'getOrder' : ActorMethod<[bigint], [] | [OrderView]>,
+  'getReviews' : ActorMethod<[bigint], Array<Review>>,
   'getSubscriberCount' : ActorMethod<[], bigint>,
+  'placeOrder' : ActorMethod<
+    [string, string, string, string, string, string, string, string, string],
+    bigint
+  >,
+  'removeFromCart' : ActorMethod<[string, bigint], undefined>,
+  'submitReview' : ActorMethod<[bigint, bigint, string, string], undefined>,
   'subscribe' : ActorMethod<[string], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
