@@ -1,46 +1,36 @@
-# Solar Camping Tent
+# Solar Camping Tent — Razorpay Integration
 
 ## Current State
-New project. No existing frontend or backend code.
+The checkout page (`CheckoutPage.tsx`) has a custom-built payment UI that mimics Razorpay's look with manually built tabs for Cards, UPI, Net Banking, Wallets, EMI, and Bank Transfer. Clicking "Pay Now" simply simulates a 2-second delay and shows a success state. There is no actual payment SDK loaded.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Full ecommerce homepage for a product called "Solar Camping Tent"
-- 9 distinct page sections (Hero, Benefits, How It Works, Gallery, Testimonials, Pricing, FAQ, Newsletter, Footer)
-- Nature-inspired design system: deep greens, earthy tones, warm amber accents
-- Mobile-responsive layout throughout
-- Newsletter form with UI-only success simulation (email not enabled)
-- Pricing tiers: Solo, Duo, Family with feature lists and CTAs
-- FAQ accordion with 6-8 questions
-- Product image gallery with outdoor photography placeholders
-- Customer testimonials with star ratings
+- Load the real Razorpay Checkout JS SDK (`https://checkout.razorpay.com/v1/checkout.js`) via a `<script>` tag injected dynamically in the CheckoutPage.
+- A `useRazorpay` custom hook that:
+  - Loads the Razorpay script once, caches it (idempotent).
+  - Exposes `openRazorpay(options)` to launch the native Razorpay modal.
+- A Razorpay configuration object built from the selected plan price (in paise), pre-filled with customer name, email, phone from the shipping form.
+- A `RAZORPAY_KEY_ID` config value (test key placeholder `rzp_test_YOUR_KEY_HERE`) at the top of CheckoutPage so the user can replace it.
+- Razorpay `handler` callback: on successful payment, capture `razorpay_payment_id` and show the existing SuccessState with that payment ID in the order details card.
+- Razorpay `modal.ondismiss` callback: reset `isPaying` back to false so the button re-enables.
+- Razorpay theming: `color: "#D97706"` (amber brand), `description: "SunCamp Gear — SolarTent"`.
+- Show a "Setup your Razorpay Key" banner at the top of the payment section when the key is still the placeholder, guiding the merchant to replace it.
 
 ### Modify
-- None (new project)
+- `handlePayNow`: Instead of the fake timeout, validate the shipping form first, then call `openRazorpay()` to launch the real modal.
+- The custom payment tabs UI (Cards, UPI, Net Banking, etc.) is replaced with a single "Pay Securely with Razorpay" button section that shows accepted payment method icons (UPI, Visa, Mastercard, RuPay, Netbanking) as a visual trust strip below the button — since Razorpay's own modal handles all method selection.
+- Order summary card: show the Payment ID returned from Razorpay in the success screen.
+- The "Pay Now" button label updated to "Pay with Razorpay" with the Razorpay logo/icon treatment.
 
 ### Remove
-- None (new project)
+- The 6-tab custom payment section (Cards, UPI, Net Banking, Wallets, EMI, Bank Transfer tabs) — the real Razorpay modal natively provides all these options.
+- The fake 2-second `setTimeout` simulation.
 
 ## Implementation Plan
-
-### Backend
-- Minimal Motoko backend to support the static homepage (no dynamic data required)
-- Newsletter signup handler: stores email submissions in-memory (UI will simulate success without real email)
-
-### Frontend Sections
-1. **Navbar**: Logo, nav links (Features, How It Works, Gallery, Pricing, FAQ), sticky header
-2. **Hero**: Full-width dramatic background image, headline, subheadline, two CTAs ("Shop Now" primary, "Buy Solar Tent" secondary)
-3. **Benefits Grid**: 6 benefit cards with icons -- Built-in Solar Panels, Weather Resistant, 60-Second Setup, USB-C Charging, Ultra-Lightweight, Off-Grid Power
-4. **How It Works**: 3-step horizontal stepper infographic -- Collect, Store, Power
-5. **Product Gallery**: Responsive masonry/grid gallery with 6 outdoor placeholder images
-6. **Testimonials**: 3-4 cards with avatar, name, rating stars, quote
-7. **Pricing**: 3 tier cards (Solo $299, Duo $449, Family $599), Duo highlighted as recommended
-8. **FAQ**: Accordion with 7 questions and answers
-9. **Newsletter**: Email input + submit, success state shown inline
-10. **Footer**: Logo, nav columns, social icons, copyright
-
-### Assets
-- Hero background: dramatic outdoor/mountain camping scene
-- Gallery images: tent in various outdoor settings (mountain, forest, desert, lake)
-- Generated via image generation tool
+1. Add `useRazorpay` hook in `src/hooks/useRazorpay.ts` — dynamically injects the Razorpay checkout script, returns `{ isLoaded, openRazorpay }`.
+2. Rewrite the `PaymentSection` component in `CheckoutPage.tsx` to show a clean Razorpay pay button with payment method icons strip.
+3. Update `handlePayNow` to call `openRazorpay` with order amount (in paise), currency INR, pre-filled customer data, theme color, and success/dismiss callbacks.
+4. Add a setup banner for the placeholder key.
+5. Pass `paymentId` from Razorpay handler into `SuccessState` to display it.
+6. Validate and deploy.

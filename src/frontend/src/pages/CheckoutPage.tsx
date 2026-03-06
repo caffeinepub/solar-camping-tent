@@ -10,8 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRazorpay } from "@/hooks/useRazorpay";
 import {
+  AlertTriangle,
   ArrowLeft,
   Check,
   ChevronRight,
@@ -19,13 +20,15 @@ import {
   Home,
   Loader2,
   Lock,
-  QrCode,
   Shield,
-  Smartphone,
   Sun,
-  Wallet,
+  Zap,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+
+/* ─── Razorpay Key ───────────────────────────────────────────── */
+const RAZORPAY_KEY_ID = "rzp_test_YOUR_KEY_HERE";
 
 /* ─── Indian States ─────────────────────────────────────────── */
 const INDIAN_STATES = [
@@ -123,18 +126,6 @@ const PLANS: Record<string, Plan> = {
   },
 };
 
-const formatINR = (amount: number) => `₹${amount.toLocaleString("en-IN")}`;
-
-/* ─── EMI Options ────────────────────────────────────────────── */
-function getEmiMonthly(total: number, months: number) {
-  return Math.round(total / months);
-}
-
-/* ─── Bank Grid ──────────────────────────────────────────────── */
-const BANKS = ["SBI", "ICICI", "Axis", "HDFC", "Kotak", "PNB"];
-const WALLETS = ["Paytm", "PhonePe", "Amazon Pay", "Mobikwik"];
-const EMI_MONTHS = [3, 6, 9, 12];
-
 /* ─── Trust Badges ───────────────────────────────────────────── */
 function TrustBadges() {
   return (
@@ -229,343 +220,120 @@ function OrderSummary({ plan }: { plan: Plan }) {
   );
 }
 
-/* ─── Payment Methods ────────────────────────────────────────── */
+/* ─── Payment Methods Strip ──────────────────────────────────── */
+const PAYMENT_METHOD_LABELS = [
+  "UPI",
+  "Visa",
+  "Mastercard",
+  "RuPay",
+  "Net Banking",
+  "Wallets",
+  "EMI",
+];
+
+/* ─── Payment Section ────────────────────────────────────────── */
 function PaymentSection({
   plan,
   onPayNow,
   isPaying,
+  isLoaded,
 }: {
   plan: Plan;
   onPayNow: () => void;
   isPaying: boolean;
+  isLoaded: boolean;
 }) {
-  const [selectedBank, setSelectedBank] = useState<string | null>(null);
-  const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
-  const [selectedEmi, setSelectedEmi] = useState<number | null>(null);
+  const isTestMode = RAZORPAY_KEY_ID === "rzp_test_YOUR_KEY_HERE";
 
   return (
     <Card className="border-border shadow-nature-sm">
       <CardHeader className="pb-3">
-        <CardTitle className="font-display text-lg font-black text-foreground">
-          Select Payment Method
+        <CardTitle className="font-display text-lg font-black text-foreground flex items-center gap-2">
+          <CreditCard className="w-5 h-5 text-amber-brand" />
+          Payment
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="cards">
-          <TabsList className="grid grid-cols-3 sm:grid-cols-6 h-auto gap-1 bg-muted p-1 rounded-xl mb-4">
-            {[
-              {
-                value: "cards",
-                label: "Cards",
-                ocid: "checkout.payment_tab.1",
-              },
-              { value: "upi", label: "UPI", ocid: "checkout.payment_tab.2" },
-              {
-                value: "netbanking",
-                label: "Net Banking",
-                ocid: "checkout.payment_tab.3",
-              },
-              {
-                value: "wallets",
-                label: "Wallets",
-                ocid: "checkout.payment_tab.4",
-              },
-              { value: "emi", label: "EMI", ocid: "checkout.payment_tab.5" },
-              {
-                value: "bank-transfer",
-                label: "Bank Transfer",
-                ocid: "checkout.payment_tab.6",
-              },
-            ].map((tab) => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                data-ocid={tab.ocid}
-                className="text-xs font-bold py-2 px-1 data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-xs rounded-lg"
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          {/* Cards Tab */}
-          <TabsContent value="cards" className="space-y-4 mt-0">
-            <div className="flex items-center gap-2 mb-3">
-              {["VISA", "MC", "RuPay"].map((brand) => (
-                <span
-                  key={brand}
-                  className="px-2 py-0.5 rounded border border-border text-xs font-black text-muted-foreground bg-background"
-                >
-                  {brand}
-                </span>
-              ))}
-            </div>
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label className="text-sm font-semibold text-foreground">
-                  Card Number
-                </Label>
-                <Input
-                  data-ocid="checkout.card_number_input"
-                  placeholder="1234 5678 9012 3456"
-                  maxLength={19}
-                  className="font-mono tracking-wider"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold text-foreground">
-                    Expiry
-                  </Label>
-                  <Input
-                    data-ocid="checkout.card_expiry_input"
-                    placeholder="MM / YY"
-                    maxLength={7}
-                    className="font-mono"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold text-foreground">
-                    CVV
-                  </Label>
-                  <Input
-                    data-ocid="checkout.card_cvv_input"
-                    placeholder="• • •"
-                    maxLength={4}
-                    type="password"
-                    className="font-mono"
-                  />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm font-semibold text-foreground">
-                  Name on Card
-                </Label>
-                <Input placeholder="RAHUL SHARMA" className="uppercase" />
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* UPI Tab */}
-          <TabsContent value="upi" className="space-y-5 mt-0">
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold text-foreground">
-                UPI ID
-              </Label>
-              <Input
-                data-ocid="checkout.upi_input"
-                placeholder="yourname@upi"
-                className="font-mono"
-              />
-              <p className="text-xs text-muted-foreground">
-                e.g. name@gpay, number@paytm, yourname@okaxis
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                or
-              </span>
-              <div className="flex-1 h-px bg-border" />
-            </div>
-
-            {/* QR code placeholder */}
-            <div className="flex flex-col items-center gap-3 p-6 rounded-xl bg-muted border border-border">
-              <div className="w-32 h-32 rounded-xl bg-background border-2 border-dashed border-border flex flex-col items-center justify-center gap-2">
-                <QrCode className="w-10 h-10 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground font-semibold">
-                  QR Code
-                </span>
-              </div>
-              <p className="text-sm font-semibold text-foreground text-center">
-                Scan with any UPI app to pay
-              </p>
-              <p className="text-xs text-muted-foreground text-center">
-                Works with GPay, PhonePe, Paytm, BHIM &amp; all UPI apps
-              </p>
-            </div>
-          </TabsContent>
-
-          {/* Net Banking Tab */}
-          <TabsContent value="netbanking" className="mt-0">
-            <p className="text-sm text-muted-foreground mb-4">
-              Select your bank to continue
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {BANKS.map((bank, i) => (
-                <button
-                  key={bank}
-                  type="button"
-                  data-ocid={`checkout.bank.button.${i + 1}`}
-                  onClick={() => setSelectedBank(bank)}
-                  className={`p-3 rounded-xl border-2 text-sm font-bold transition-all duration-150 text-left hover:border-forest/40 hover:bg-forest/5 active:scale-[0.98] ${
-                    selectedBank === bank
-                      ? "border-forest bg-forest/8 text-forest"
-                      : "border-border text-foreground"
-                  }`}
-                >
-                  <div className="w-8 h-8 rounded-lg bg-forest/10 flex items-center justify-center mb-2">
-                    <span className="text-xs font-black text-forest">
-                      {bank.slice(0, 2)}
-                    </span>
-                  </div>
-                  {bank}
-                </button>
-              ))}
-            </div>
-            {selectedBank && (
-              <p className="mt-3 text-xs text-muted-foreground">
-                You will be redirected to <strong>{selectedBank}</strong>{" "}
-                internet banking page.
-              </p>
-            )}
-          </TabsContent>
-
-          {/* Wallets Tab */}
-          <TabsContent value="wallets" className="mt-0">
-            <p className="text-sm text-muted-foreground mb-4">
-              Pay using your mobile wallet
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {WALLETS.map((wallet, i) => {
-                const walletColors: Record<string, string> = {
-                  Paytm: "bg-sky-50 text-sky-700",
-                  PhonePe: "bg-purple-50 text-purple-700",
-                  "Amazon Pay": "bg-orange-50 text-orange-700",
-                  Mobikwik: "bg-blue-50 text-blue-700",
-                };
-                return (
-                  <button
-                    key={wallet}
-                    type="button"
-                    data-ocid={`checkout.wallet.button.${i + 1}`}
-                    onClick={() => setSelectedWallet(wallet)}
-                    className={`p-4 rounded-xl border-2 flex items-center gap-3 text-sm font-bold transition-all duration-150 hover:border-forest/40 active:scale-[0.98] ${
-                      selectedWallet === wallet
-                        ? "border-forest bg-forest/8"
-                        : "border-border"
-                    }`}
-                  >
-                    <div
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center ${walletColors[wallet] ?? "bg-muted text-muted-foreground"}`}
-                    >
-                      <Wallet className="w-4 h-4" />
-                    </div>
-                    <span className="text-foreground">{wallet}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </TabsContent>
-
-          {/* EMI Tab */}
-          <TabsContent value="emi" className="mt-0">
-            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-brand/10 border border-amber-brand/25 mb-4">
-              <Smartphone className="w-4 h-4 text-amber-brand mt-0.5 flex-shrink-0" />
-              <p className="text-xs font-semibold text-foreground">
-                No Cost EMI available on all major Credit &amp; Debit cards
-              </p>
-            </div>
-            <div className="space-y-2">
-              {EMI_MONTHS.map((months, i) => {
-                const monthly = getEmiMonthly(plan.price, months);
-                return (
-                  <button
-                    key={months}
-                    type="button"
-                    data-ocid={`checkout.emi.button.${i + 1}`}
-                    onClick={() => setSelectedEmi(months)}
-                    className={`w-full p-4 rounded-xl border-2 flex items-center justify-between text-sm transition-all duration-150 hover:border-forest/40 hover:bg-forest/5 active:scale-[0.98] ${
-                      selectedEmi === months
-                        ? "border-forest bg-forest/8"
-                        : "border-border"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                          selectedEmi === months
-                            ? "border-forest"
-                            : "border-muted-foreground"
-                        }`}
-                      >
-                        {selectedEmi === months && (
-                          <div className="w-2 h-2 rounded-full bg-forest" />
-                        )}
-                      </div>
-                      <span className="font-bold text-foreground">
-                        {months} months
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-black text-foreground">
-                        {formatINR(monthly)}/mo
-                      </span>
-                      <span className="block text-xs text-forest font-semibold">
-                        No Cost EMI
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </TabsContent>
-
-          {/* Bank Transfer Tab */}
-          <TabsContent value="bank-transfer" className="space-y-4 mt-0">
-            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-muted border border-border mb-2">
-              <CreditCard className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-muted-foreground">
-                Transfer directly to our bank account. Payment verified within 1
-                business day.
-              </p>
-            </div>
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label className="text-sm font-semibold text-foreground">
-                  Account Number
-                </Label>
-                <Input
-                  placeholder="Enter your account number"
-                  className="font-mono"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm font-semibold text-foreground">
-                  IFSC Code
-                </Label>
-                <Input
-                  placeholder="e.g. HDFC0001234"
-                  className="font-mono uppercase"
-                />
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        <div className="mt-6 space-y-3">
-          <Button
-            data-ocid="checkout.pay_button"
-            size="lg"
-            onClick={onPayNow}
-            disabled={isPaying}
-            className="w-full btn-amber-stamp bg-amber-brand hover:bg-amber-dark text-accent-foreground font-black text-base py-6 transition-all duration-150 active:scale-[0.98] disabled:opacity-70"
+      <CardContent className="space-y-4">
+        {/* Test Mode Banner */}
+        {isTestMode && (
+          <div
+            data-ocid="checkout.error_state"
+            className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50 border border-amber-200"
           >
-            {isPaying ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Processing…
-              </>
-            ) : (
-              <>
-                <Lock className="w-4 h-4 mr-2" />
-                Pay Now {plan.displayPrice}
-              </>
-            )}
-          </Button>
-          <TrustBadges />
+            <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            <p className="text-xs font-semibold text-amber-800 leading-relaxed">
+              <span className="font-black">⚠ Test Mode:</span> Replace{" "}
+              <code className="bg-amber-100 px-1 rounded font-mono">
+                RAZORPAY_KEY_ID
+              </code>{" "}
+              in CheckoutPage.tsx with your actual Razorpay key to accept real
+              payments.
+            </p>
+          </div>
+        )}
+
+        {/* Razorpay Branding Strip */}
+        <div className="flex items-center justify-between p-3 rounded-xl bg-[#3395FF]/8 border border-[#3395FF]/20">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#3395FF] flex items-center justify-center">
+              <Zap className="w-4 h-4 text-white" strokeWidth={2.5} />
+            </div>
+            <div>
+              <p className="text-xs font-black text-foreground">
+                Powered by Razorpay
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                India's most trusted payment gateway
+              </p>
+            </div>
+          </div>
+          <Lock className="w-4 h-4 text-muted-foreground" />
         </div>
+
+        {/* Pay Button */}
+        <Button
+          data-ocid="checkout.pay_button"
+          size="lg"
+          onClick={onPayNow}
+          disabled={isPaying || !isLoaded}
+          className="w-full bg-[#3395FF] hover:bg-[#2276e8] text-white font-black text-base py-6 rounded-xl transition-all duration-150 active:scale-[0.98] disabled:opacity-70 shadow-md hover:shadow-lg"
+        >
+          {isPaying ? (
+            <>
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              Opening Razorpay…
+            </>
+          ) : !isLoaded ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Loading…
+            </>
+          ) : (
+            <>
+              <Lock className="w-4 h-4 mr-2" />
+              Pay with Razorpay — {plan.displayPrice}
+            </>
+          )}
+        </Button>
+
+        {/* Payment Methods Strip */}
+        <div className="space-y-2">
+          <p className="text-[11px] text-muted-foreground text-center font-semibold uppercase tracking-wider">
+            Accepted Payment Methods
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
+            {PAYMENT_METHOD_LABELS.map((method) => (
+              <span
+                key={method}
+                className="px-2.5 py-1 rounded-full border border-border bg-muted text-[11px] font-semibold text-muted-foreground"
+              >
+                {method}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <TrustBadges />
       </CardContent>
     </Card>
   );
@@ -758,10 +526,12 @@ function CustomerForm({
 function SuccessState({
   plan,
   name,
+  paymentId,
   onGoHome,
 }: {
   plan: Plan;
   name: string;
+  paymentId?: string;
   onGoHome: () => void;
 }) {
   return (
@@ -810,12 +580,16 @@ function SuccessState({
                 Free · 5–7 business days
               </span>
             </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Payment ID</span>
+              <span className="font-mono font-semibold text-foreground text-xs">
+                {paymentId ||
+                  `ST${Math.floor(100000 + Math.random() * 900000)}`}
+              </span>
+            </div>
             <Separator />
             <p className="text-xs text-muted-foreground">
-              A confirmation email has been sent to your inbox. Order ID:{" "}
-              <span className="font-mono font-semibold text-foreground">
-                ST{Math.floor(100000 + Math.random() * 900000)}
-              </span>
+              A confirmation email has been sent to your inbox.
             </p>
           </CardContent>
         </Card>
@@ -840,6 +614,8 @@ export default function CheckoutPage() {
   const planId = searchParams.get("plan") ?? "duo";
   const plan = PLANS[planId] ?? PLANS.duo;
 
+  const { isLoaded, openRazorpay } = useRazorpay();
+
   const [form, setForm] = useState<FormData>({
     name: "",
     email: "",
@@ -852,13 +628,54 @@ export default function CheckoutPage() {
 
   const [isPaying, setIsPaying] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [paymentId, setPaymentId] = useState<string>("");
 
   const handlePayNow = () => {
+    if (
+      !form.name ||
+      !form.email ||
+      !form.phone ||
+      !form.address ||
+      !form.city ||
+      !form.state ||
+      !form.pincode
+    ) {
+      toast.error("Please fill in all shipping details before payment.");
+      return;
+    }
+
     setIsPaying(true);
-    setTimeout(() => {
-      setIsPaying(false);
-      setIsSuccess(true);
-    }, 2000);
+
+    openRazorpay({
+      key: RAZORPAY_KEY_ID,
+      amount: plan.price * 100, // paise
+      currency: "INR",
+      name: "SunCamp Gear",
+      description: `SolarTent — ${plan.name} Edition`,
+      image: "/assets/generated/hero-tent.dim_1600x900.jpg",
+      prefill: {
+        name: form.name,
+        email: form.email,
+        contact: form.phone,
+      },
+      notes: {
+        address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+        plan: plan.name,
+      },
+      theme: {
+        color: "#D97706",
+      },
+      handler: (response: { razorpay_payment_id: string }) => {
+        setIsPaying(false);
+        setPaymentId(response.razorpay_payment_id);
+        setIsSuccess(true);
+      },
+      modal: {
+        ondismiss: () => {
+          setIsPaying(false);
+        },
+      },
+    });
   };
 
   const handleGoHome = () => {
@@ -867,7 +684,12 @@ export default function CheckoutPage() {
 
   if (isSuccess) {
     return (
-      <SuccessState plan={plan} name={form.name} onGoHome={handleGoHome} />
+      <SuccessState
+        plan={plan}
+        name={form.name}
+        paymentId={paymentId}
+        onGoHome={handleGoHome}
+      />
     );
   }
 
@@ -937,12 +759,13 @@ export default function CheckoutPage() {
               }}
             />
 
-            {/* Payment section (desktop: left, mobile: below order summary) */}
+            {/* Payment section (mobile: below form) */}
             <div id="payment-section" className="lg:hidden">
               <PaymentSection
                 plan={plan}
                 onPayNow={handlePayNow}
                 isPaying={isPaying}
+                isLoaded={isLoaded}
               />
             </div>
           </div>
@@ -955,6 +778,7 @@ export default function CheckoutPage() {
                 plan={plan}
                 onPayNow={handlePayNow}
                 isPaying={isPaying}
+                isLoaded={isLoaded}
               />
             </div>
           </div>
