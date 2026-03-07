@@ -1315,7 +1315,7 @@ function CustomerForm({
               >
                 <SelectValue placeholder="Select state" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-72 overflow-y-auto">
                 {INDIAN_STATES.map((s) => (
                   <SelectItem key={s} value={s}>
                     {s}
