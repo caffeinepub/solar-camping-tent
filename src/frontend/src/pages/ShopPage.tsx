@@ -297,13 +297,11 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
         </p>
         <StarRating rating={product.rating} count={product.reviewCount} />
 
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
-          <div>
+        <div className="mt-4 border-t border-border pt-4 space-y-3">
+          <div className="flex items-center justify-between">
             <span className="font-display font-black text-xl text-foreground">
               ₹{product.price.toLocaleString("en-IN")}
             </span>
-          </div>
-          <div className="flex items-center gap-2">
             {product.slug && (
               <Button
                 variant="outline"
@@ -311,19 +309,19 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
                 onClick={() => navigate({ to: "/product/solar-camping-tent" })}
                 className="text-xs font-bold border-border hover:border-forest hover:text-forest"
               >
-                View
+                View Details
               </Button>
             )}
-            <Button
-              size="sm"
-              data-ocid={`shop.add_to_cart.button.${index + 1}`}
-              onClick={handleAddToCart}
-              className="btn-amber-stamp bg-amber-brand hover:bg-amber-dark text-accent-foreground font-bold text-xs px-3 transition-all duration-150 active:scale-[0.98] flex items-center gap-1.5"
-            >
-              <ShoppingCart className="w-3.5 h-3.5" />
-              Add to Cart
-            </Button>
           </div>
+          <Button
+            size="sm"
+            data-ocid={`shop.add_to_cart.button.${index + 1}`}
+            onClick={handleAddToCart}
+            className="w-full btn-amber-stamp bg-amber-brand hover:bg-amber-dark text-accent-foreground font-bold text-xs transition-all duration-150 active:scale-[0.98] flex items-center justify-center gap-1.5"
+          >
+            <ShoppingCart className="w-3.5 h-3.5" />
+            Add to Cart
+          </Button>
         </div>
       </div>
     </article>
@@ -418,10 +416,10 @@ export default function ShopPage() {
           <p className="text-amber-brand font-black text-xs tracking-[0.2em] uppercase mb-2">
             SolTrek Store
           </p>
-          <h1 className="font-display font-black text-white text-4xl sm:text-5xl lg:text-6xl leading-tight mb-3">
+          <h1 className="font-display font-black text-gray-900 text-4xl sm:text-5xl lg:text-6xl leading-tight mb-3">
             Adventure Gear
           </h1>
-          <p className="text-white/80 text-lg max-w-md">
+          <p className="text-gray-800 text-lg max-w-md">
             Solar-powered tents and outdoor essentials for every expedition.
           </p>
         </div>
