@@ -29,16 +29,16 @@ interface CartContextType {
 
 /* ─── Helpers ────────────────────────────────────────────────── */
 function getOrCreateSessionId(): string {
-  const stored = localStorage.getItem("suncampgear_session_id");
+  const stored = localStorage.getItem("soltrek_session_id");
   if (stored) return stored;
   const id = `session_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-  localStorage.setItem("suncampgear_session_id", id);
+  localStorage.setItem("soltrek_session_id", id);
   return id;
 }
 
 function loadCartFromStorage(): CartItem[] {
   try {
-    const raw = localStorage.getItem("suncampgear_cart");
+    const raw = localStorage.getItem("soltrek_cart");
     if (!raw) return [];
     const parsed = JSON.parse(raw) as Array<{
       productId: string;
@@ -61,7 +61,7 @@ function saveCartToStorage(items: CartItem[]) {
     ...item,
     productId: item.productId.toString(),
   }));
-  localStorage.setItem("suncampgear_cart", JSON.stringify(serializable));
+  localStorage.setItem("soltrek_cart", JSON.stringify(serializable));
 }
 
 /* ─── Context ────────────────────────────────────────────────── */

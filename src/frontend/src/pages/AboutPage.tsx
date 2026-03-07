@@ -64,7 +64,7 @@ const SUSTAINABILITY_POINTS = [
 ];
 
 export default function AboutPage() {
-  usePageTitle("About SunCamp Gear | Solar Camping Innovation from India");
+  usePageTitle("About SolTrek | Solar Camping Innovation from India");
 
   return (
     <div className="min-h-screen">
@@ -72,7 +72,7 @@ export default function AboutPage() {
       <section className="relative min-h-[60vh] flex items-end overflow-hidden bg-forest-dark">
         <img
           src="/assets/generated/about-team.dim_1200x600.jpg"
-          alt="SunCamp Gear founding team on a Himalayan trek"
+          alt="SolTrek founding team on a Himalayan trek"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-50"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-forest-dark via-forest-dark/60 to-transparent" />
@@ -115,7 +115,7 @@ export default function AboutPage() {
                   </strong>
                 </p>
                 <p>
-                  They spent two years developing the SunCamp Solar Tent,
+                  They spent two years developing the SolTrek Solar Tent,
                   combining lightweight camping design with integrated solar
                   technology. Eighteen prototypes. Twelve field tests across
                   four mountain ranges. Hundreds of hours of engineering. And
@@ -123,9 +123,9 @@ export default function AboutPage() {
                   under the stars.
                 </p>
                 <p>
-                  SunCamp Gear was founded in 2021 in Bengaluru. Today we serve
-                  over 15,000 adventurers across India, from Leh to Arunachal,
-                  from the Himalayas to the Nilgiris.
+                  SolTrek was founded in 2021 in Bengaluru. Today we serve over
+                  15,000 adventurers across India, from Leh to Arunachal, from
+                  the Himalayas to the Nilgiris.
                 </p>
               </div>
             </div>

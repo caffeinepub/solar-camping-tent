@@ -32,8 +32,8 @@ const CONTACT_INFO = [
   {
     icon: Mail,
     label: "Email Support",
-    value: "support@suncampgear.com",
-    href: "mailto:support@suncampgear.com",
+    value: "support@soltrek.in",
+    href: "mailto:support@soltrek.in",
     desc: "Response within 24 hours",
   },
   {
@@ -46,7 +46,7 @@ const CONTACT_INFO = [
   {
     icon: MapPin,
     label: "Office Address",
-    value: "SunCamp Gear, 12, Tech Park Road, Whitefield, Bengaluru – 560066",
+    value: "SolTrek, 12, Tech Park Road, Whitefield, Bengaluru – 560066",
     href: "https://maps.google.com/?q=Whitefield+Bengaluru",
     desc: "Karnataka, India",
   },
@@ -86,7 +86,7 @@ type FormState = {
 };
 
 export default function ContactPage() {
-  usePageTitle("Contact SunCamp Gear | Customer Support");
+  usePageTitle("Contact SolTrek | Customer Support");
 
   const [form, setForm] = useState<FormState>({
     name: "",
@@ -175,7 +175,7 @@ export default function ContactPage() {
 
             {/* WhatsApp CTA */}
             <a
-              href="https://wa.me/919876543210?text=Hi%20SunCamp%20Gear%2C%20I%20have%20a%20question%20about%20your%20products."
+              href="https://wa.me/919876543210?text=Hi%20SolTrek%2C%20I%20have%20a%20question%20about%20your%20products."
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-4 p-5 rounded-2xl bg-[#25D366] text-white hover:bg-[#1ebe5d] transition-colors group"
@@ -207,7 +207,7 @@ export default function ContactPage() {
               </div>
               <div className="p-4 border-t border-border">
                 <p className="text-sm font-semibold text-foreground">
-                  SunCamp Gear HQ
+                  SolTrek HQ
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   12, Tech Park Road, Whitefield, Bengaluru – 560066

@@ -25,7 +25,7 @@ export default function PolicyLayout({
       <div className="bg-forest-dark pt-24 pb-12">
         <div className="container max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-amber-brand font-black text-xs tracking-[0.2em] uppercase mb-3">
-            SunCamp Gear
+            SolTrek
           </p>
           <h1 className="font-display font-black text-white text-4xl sm:text-5xl leading-tight mb-2">
             {title}

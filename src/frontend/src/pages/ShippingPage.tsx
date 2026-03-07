@@ -3,7 +3,7 @@ import PolicyLayout from "./PolicyLayout";
 
 export default function ShippingPage() {
   useEffect(() => {
-    document.title = "Shipping Policy | SunCamp Gear";
+    document.title = "Shipping Policy | SolTrek";
   }, []);
 
   return (
@@ -14,9 +14,9 @@ export default function ShippingPage() {
     >
       <h2>Overview</h2>
       <p>
-        At SunCamp Gear, we work hard to get your adventure gear to you as
-        quickly and safely as possible. This policy covers all orders placed on
-        our website (suncampgear.com) for delivery within India.
+        At SolTrek, we work hard to get your adventure gear to you as quickly
+        and safely as possible. This policy covers all orders placed on our
+        website (soltrek.in) for delivery within India.
       </p>
 
       <h2>Processing Time</h2>
@@ -119,7 +119,7 @@ export default function ShippingPage() {
       <p>
         If your pin code is not serviceable, you will be notified during
         checkout. Please contact our support team at{" "}
-        <strong>support@suncampgear.com</strong> to arrange alternative delivery
+        <strong>support@soltrek.in</strong> to arrange alternative delivery
         options.
       </p>
 
@@ -138,7 +138,7 @@ export default function ShippingPage() {
       <p>
         In case of a significant delay, we will proactively notify you via
         email. For any delivery concerns, please contact us at{" "}
-        <strong>support@suncampgear.com</strong> or WhatsApp{" "}
+        <strong>support@soltrek.in</strong> or WhatsApp{" "}
         <strong>+91 98765 43210</strong>.
       </p>
 
@@ -160,7 +160,7 @@ export default function ShippingPage() {
       <p>For all shipping-related queries, please reach out to us:</p>
       <ul>
         <li>
-          <strong>Email</strong>: support@suncampgear.com
+          <strong>Email</strong>: support@soltrek.in
         </li>
         <li>
           <strong>Phone</strong>: +91 98765 43210 (Mon–Sat, 9AM–7PM IST)

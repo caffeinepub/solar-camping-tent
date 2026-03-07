@@ -34,7 +34,7 @@ export default function WhatsAppButton() {
                 <MessageCircle className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-white font-bold text-sm">SunCamp Support</p>
+                <p className="text-white font-bold text-sm">SolTrek Support</p>
                 <p className="text-white/80 text-xs">
                   Typically replies instantly
                 </p>

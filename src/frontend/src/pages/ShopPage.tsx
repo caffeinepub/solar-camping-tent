@@ -19,7 +19,7 @@ function usePageTitle(title: string) {
     document.title = title;
     return () => {
       document.title =
-        "SunCamp Gear - Solar Powered Camping Tents | Smart Outdoor Adventure";
+        "SolTrek - Solar Powered Camping Tents | Smart Outdoor Adventure";
     };
   }, [title]);
 }
@@ -52,7 +52,7 @@ const PRODUCTS: Product[] = [
   // Solar Camping Tent
   {
     id: 1n,
-    name: "SunCamp Solo Solar Camping Tent",
+    name: "SolTrek Solo Solar Camping Tent",
     category: "Solar Camping Tent",
     price: 5999,
     description:
@@ -65,7 +65,7 @@ const PRODUCTS: Product[] = [
   },
   {
     id: 2n,
-    name: "SunCamp Duo Solar Tent",
+    name: "SolTrek Duo Solar Tent",
     category: "Solar Camping Tent",
     price: 8999,
     description:
@@ -77,7 +77,7 @@ const PRODUCTS: Product[] = [
   },
   {
     id: 3n,
-    name: "SunCamp Pro Solar Tent",
+    name: "SolTrek Pro Solar Tent",
     category: "Solar Camping Tent",
     price: 12999,
     description:
@@ -365,7 +365,7 @@ function TrustBadgesStrip() {
 /* ─── ShopPage ───────────────────────────────────────────────── */
 export default function ShopPage() {
   usePageTitle(
-    "Shop Outdoor Gear | Solar Camping Tents, Accessories | SunCamp Gear",
+    "Shop Outdoor Gear | Solar Camping Tents, Accessories | SolTrek",
   );
 
   const [activeCategory, setActiveCategory] = useState<Category>("All");
@@ -410,13 +410,13 @@ export default function ShopPage() {
       <section className="relative h-72 sm:h-80 overflow-hidden">
         <img
           src="/assets/generated/shop-hero-banner.dim_1400x500.jpg"
-          alt="SunCamp Gear outdoor shop"
+          alt="SolTrek outdoor shop"
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-forest-dark/80 via-forest-dark/50 to-transparent" />
-        <div className="relative h-full container max-w-6xl mx-auto px-4 sm:px-6 flex flex-col justify-center">
+        <div className="relative h-full container max-w-6xl mx-auto px-4 sm:px-6 flex flex-col justify-center pt-16">
           <p className="text-amber-brand font-black text-xs tracking-[0.2em] uppercase mb-2">
-            SunCamp Gear Store
+            SolTrek Store
           </p>
           <h1 className="font-display font-black text-white text-4xl sm:text-5xl lg:text-6xl leading-tight mb-3">
             Adventure Gear

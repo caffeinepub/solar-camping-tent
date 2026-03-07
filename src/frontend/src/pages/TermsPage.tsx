@@ -3,7 +3,7 @@ import PolicyLayout from "./PolicyLayout";
 
 export default function TermsPage() {
   useEffect(() => {
-    document.title = "Terms & Conditions | SunCamp Gear";
+    document.title = "Terms & Conditions | SolTrek";
   }, []);
 
   return (
@@ -14,10 +14,9 @@ export default function TermsPage() {
     >
       <h2>Agreement to Terms</h2>
       <p>
-        By accessing or using the SunCamp Gear website (suncampgear.com) or
-        placing an order with us, you agree to be bound by these Terms &
-        Conditions. If you do not agree to these terms, please do not use our
-        website.
+        By accessing or using the SolTrek website (soltrek.in) or placing an
+        order with us, you agree to be bound by these Terms & Conditions. If you
+        do not agree to these terms, please do not use our website.
       </p>
 
       <h2>Website Usage Rules</h2>
@@ -140,7 +139,7 @@ export default function TermsPage() {
 
       <h2>Limitation of Liability</h2>
       <p>
-        To the maximum extent permitted by applicable Indian law, SunCamp Gear's
+        To the maximum extent permitted by applicable Indian law, SolTrek's
         total liability for any claim arising from your use of our website or
         products shall not exceed the amount you paid for the specific product
         giving rise to the claim.
@@ -164,10 +163,10 @@ export default function TermsPage() {
 
       <h2>Intellectual Property</h2>
       <p>
-        All content on the SunCamp Gear website — including text, images, logos,
+        All content on the SolTrek website — including text, images, logos,
         product designs, graphics, videos, and software — is owned by or
-        licensed to SunCamp Gear and protected by Indian and international
-        copyright, trademark, and intellectual property laws.
+        licensed to SolTrek and protected by Indian and international copyright,
+        trademark, and intellectual property laws.
       </p>
       <p>You may not:</p>
       <ul>
@@ -182,7 +181,7 @@ export default function TermsPage() {
       </ul>
       <p>
         For licensing or collaboration inquiries, contact us at{" "}
-        <strong>support@suncampgear.com</strong>.
+        <strong>support@soltrek.in</strong>.
       </p>
 
       <h2>User Reviews and Content</h2>
@@ -217,11 +216,11 @@ export default function TermsPage() {
       <p>For any questions about these Terms & Conditions:</p>
       <ul>
         <li>
-          <strong>Email</strong>: legal@suncampgear.com
+          <strong>Email</strong>: legal@soltrek.in
         </li>
         <li>
-          <strong>Address</strong>: SunCamp Gear, 12, Tech Park Road,
-          Whitefield, Bengaluru – 560066
+          <strong>Address</strong>: SolTrek, 12, Tech Park Road, Whitefield,
+          Bengaluru – 560066
         </li>
       </ul>
     </PolicyLayout>

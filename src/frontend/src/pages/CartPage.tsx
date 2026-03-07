@@ -18,7 +18,7 @@ export default function CartPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Shopping Cart | SunCamp Gear";
+    document.title = "Shopping Cart | SolTrek";
   }, []);
 
   if (items.length === 0) {

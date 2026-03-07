@@ -51,11 +51,11 @@ const PRODUCT_ID = 1n;
 const GALLERY_IMAGES = [
   {
     src: "/assets/generated/product-solar-tent-main.dim_800x800.jpg",
-    alt: "SunCamp Solo Solar Camping Tent - Main View",
+    alt: "SolTrek Solo Solar Camping Tent - Main View",
   },
   {
     src: "/assets/generated/gallery-forest.dim_800x600.jpg",
-    alt: "SunCamp Solo Tent set up in a lush forest",
+    alt: "SolTrek Solo Tent set up in a lush forest",
   },
   {
     src: "/assets/generated/product-tent-gallery-2.dim_800x600.jpg",
@@ -116,7 +116,7 @@ const KEY_BENEFITS = [
   {
     icon: "🎒",
     title: "Go Light, Go Far",
-    desc: "At just 1.8 kg total packed weight, the SunCamp Solo won't slow you down on multi-day treks. Fits in any 45L+ backpack.",
+    desc: "At just 1.8 kg total packed weight, the SolTrek Solo won't slow you down on multi-day treks. Fits in any 45L+ backpack.",
   },
   {
     icon: "🏔️",
@@ -126,7 +126,7 @@ const KEY_BENEFITS = [
 ];
 
 const BOX_CONTENTS = [
-  "1× SunCamp Solar Tent Body",
+  "1× SolTrek Solar Tent Body",
   "1× Rain Fly with Integrated 1W Solar Panel",
   "2× Fiberglass Tent Poles",
   "6× Aluminium Tent Pegs",
@@ -146,7 +146,7 @@ const FAQS = [
   },
   {
     q: "Can I charge two devices simultaneously?",
-    a: "No. The Solo model has a single USB-A port (5V/1A). For multi-device charging, consider the SunCamp Duo or Pro with dual USB ports.",
+    a: "No. The Solo model has a single USB-A port (5V/1A). For multi-device charging, consider the SolTrek Duo or Pro with dual USB ports.",
   },
   {
     q: "How long does it take to fully charge a phone?",
@@ -158,7 +158,7 @@ const FAQS = [
   },
   {
     q: "Does it come with a warranty?",
-    a: "Yes — every SunCamp Solar Tent comes with a 1-year manufacturing defect warranty. This covers the tent body, poles, and solar panel. Accidental damage is excluded.",
+    a: "Yes — every SolTrek Solar Tent comes with a 1-year manufacturing defect warranty. This covers the tent body, poles, and solar panel. Accidental damage is excluded.",
   },
 ];
 
@@ -542,7 +542,7 @@ function ReviewsSection() {
 
 /* ─── ProductPage ────────────────────────────────────────────── */
 export default function ProductPage() {
-  usePageTitle("SunCamp Solo Solar Camping Tent - ₹5,999 | Buy Online India");
+  usePageTitle("SolTrek Solo Solar Camping Tent - ₹5,999 | Buy Online India");
 
   const navigate = useNavigate();
   const { addItem } = useCart();
@@ -561,7 +561,7 @@ export default function ProductPage() {
   const handleAddToCart = () => {
     addItem({
       productId: PRODUCT_ID,
-      productName: "SunCamp Solo Solar Camping Tent",
+      productName: "SolTrek Solo Solar Camping Tent",
       price: 5999,
       image: "/assets/generated/product-solar-tent-main.dim_800x800.jpg",
       quantity,
@@ -625,7 +625,7 @@ export default function ProductPage() {
                 Solar Camping Tent
               </p>
               <h1 className="font-display font-black text-3xl sm:text-4xl text-foreground leading-tight mb-3">
-                SunCamp Solo Solar Camping Tent
+                SolTrek Solo Solar Camping Tent
               </h1>
 
               {/* Rating */}
@@ -754,7 +754,7 @@ export default function ProductPage() {
             <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
               Adventure without limits. The{" "}
               <strong className="text-foreground">
-                SunCamp Solo Solar Camping Tent
+                SolTrek Solo Solar Camping Tent
               </strong>{" "}
               is engineered for solo trekkers and weekend adventurers who refuse
               to let a dead battery end the journey. With an integrated{" "}
@@ -772,7 +772,7 @@ export default function ProductPage() {
               </strong>{" "}
               210D ripstop nylon keeps you dry in heavy rain, including monsoon
               conditions. Whether you're camping in the Himalayas, the Western
-              Ghats, or a weekend forest retreat, the SunCamp Solo keeps you
+              Ghats, or a weekend forest retreat, the SolTrek Solo keeps you
               connected and powered.
             </p>
             <p className="text-muted-foreground leading-relaxed text-base sm:text-lg mt-4">

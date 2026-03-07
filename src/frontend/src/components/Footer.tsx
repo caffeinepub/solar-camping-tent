@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Sun, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 const footerLinks = {
   Products: [
@@ -36,11 +36,13 @@ export default function Footer() {
           {/* Brand col */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full bg-amber-brand flex items-center justify-center shadow-amber">
-                <Sun className="w-4 h-4 text-white" strokeWidth={2.5} />
-              </div>
+              <img
+                src="/assets/uploads/WhatsApp-Image-2026-03-06-at-10.39.20-PM-1.jpeg"
+                alt="SolTrek logo"
+                className="w-10 h-10 object-contain rounded-md"
+              />
               <span className="font-display font-black text-xl text-white">
-                SunCamp Gear
+                SolTrek
               </span>
             </div>
             <p className="text-white/55 text-sm leading-relaxed mb-4">
@@ -106,7 +108,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-white/40 text-xs">
-          <p>© {currentYear} SunCamp Gear. All rights reserved.</p>
+          <p>© {currentYear} SolTrek. All rights reserved.</p>
           <a
             href={caffeineUrl}
             target="_blank"

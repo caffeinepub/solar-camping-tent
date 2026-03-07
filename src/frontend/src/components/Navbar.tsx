@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Menu, ShoppingCart, Sun, X } from "lucide-react";
+import { Menu, ShoppingCart, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart } from "../contexts/CartContext";
 
@@ -43,15 +43,17 @@ export default function Navbar() {
           className="flex items-center gap-2 group"
           data-ocid="nav.link.1"
         >
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-brand shadow-amber">
-            <Sun className="w-4 h-4 text-white" strokeWidth={2.5} />
-          </span>
+          <img
+            src="/assets/uploads/WhatsApp-Image-2026-03-06-at-10.39.20-PM-1.jpeg"
+            alt="SolTrek logo"
+            className="w-10 h-10 object-contain rounded-md"
+          />
           <span
             className={`font-display font-black text-xl tracking-tight transition-colors ${
               solidBg ? "text-forest-dark" : "text-white"
             }`}
           >
-            SunCamp Gear
+            SolTrek
           </span>
         </Link>
 

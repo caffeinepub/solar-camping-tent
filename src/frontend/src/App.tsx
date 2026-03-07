@@ -125,8 +125,7 @@ function Hero() {
         </h1>
 
         <p className="text-white/80 text-lg sm:text-xl font-medium max-w-xl mx-auto mb-10 leading-relaxed tracking-wide">
-          The world&apos;s smartest camping tent with built-in solar charging.
-          Made for India&apos;s adventurers.
+          Suraj ki power, Har camp ke sath
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -220,7 +219,7 @@ function Benefits() {
         <div className="fade-in-up" ref={ref}>
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-black tracking-[0.2em] uppercase text-amber-brand mb-3">
-              Why SunCamp Gear
+              Why SolTrek
             </span>
             <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-foreground leading-tight mb-4">
               Built for the Wilderness.{" "}
@@ -345,7 +344,7 @@ function HowItWorks() {
             {/* Decorative glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-amber-brand/10 rounded-full blur-3xl pointer-events-none" />
             <p className="relative text-white/90 text-lg sm:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
-              In 6–8 hours of direct Indian summer sun, the SunCamp Solo
+              In 6–8 hours of direct Indian summer sun, the SolTrek Solo
               generates enough power to fully charge a smartphone{" "}
               <strong className="text-amber-brand font-black">
                 once completely
@@ -720,7 +719,7 @@ const faqs = [
   },
   {
     q: "Is it suitable for India's monsoon season?",
-    a: "Yes. The SunCamp Solo has a 2000mm waterproof head rating with factory-taped seams. We've tested it in Coorg and Kodaikanal during peak monsoon — it stays bone dry inside.",
+    a: "Yes. The SolTrek Solo has a 2000mm waterproof head rating with factory-taped seams. We've tested it in Coorg and Kodaikanal during peak monsoon — it stays bone dry inside.",
   },
   {
     q: "How fast is the setup really?",
@@ -897,7 +896,7 @@ function Newsletter() {
 function HomePage() {
   useEffect(() => {
     document.title =
-      "SunCamp Gear - Solar Powered Camping Tents | Smart Outdoor Adventure";
+      "SolTrek - Solar Powered Camping Tents | Smart Outdoor Adventure";
   }, []);
 
   return (

@@ -3,7 +3,7 @@ import PolicyLayout from "./PolicyLayout";
 
 export default function PrivacyPage() {
   useEffect(() => {
-    document.title = "Privacy Policy | SunCamp Gear";
+    document.title = "Privacy Policy | SolTrek";
   }, []);
 
   return (
@@ -14,11 +14,11 @@ export default function PrivacyPage() {
     >
       <h2>Introduction</h2>
       <p>
-        SunCamp Gear ("we", "us", or "our") operates the website
-        suncampgear.com. This Privacy Policy explains how we collect, use,
-        disclose, and protect your personal information when you visit our
-        website, make a purchase, or interact with us in any way. By using our
-        website, you consent to the practices described in this policy.
+        SolTrek ("we", "us", or "our") operates the website soltrek.in. This
+        Privacy Policy explains how we collect, use, disclose, and protect your
+        personal information when you visit our website, make a purchase, or
+        interact with us in any way. By using our website, you consent to the
+        practices described in this policy.
       </p>
 
       <h2>Information We Collect</h2>
@@ -102,7 +102,7 @@ export default function PrivacyPage() {
       <p>
         For UPI and bank transfers, transactions are processed through secure,
         RBI-approved payment rails. Your financial credentials are never stored
-        or accessible to SunCamp Gear employees.
+        or accessible to SolTrek employees.
       </p>
 
       <h2>Email Marketing</h2>
@@ -116,8 +116,8 @@ export default function PrivacyPage() {
       <p>
         You can unsubscribe from marketing emails at any time by clicking the
         "Unsubscribe" link in any email, or by contacting us at
-        support@suncampgear.com. We will never sell or rent your email address
-        to third parties.
+        support@soltrek.in. We will never sell or rent your email address to
+        third parties.
       </p>
 
       <h2>Data Sharing</h2>
@@ -183,8 +183,7 @@ export default function PrivacyPage() {
       </ul>
       <p>
         To exercise any of these rights, please contact us at{" "}
-        <strong>support@suncampgear.com</strong>. We will respond within 30
-        days.
+        <strong>support@soltrek.in</strong>. We will respond within 30 days.
       </p>
 
       <h2>Children's Privacy</h2>
@@ -210,11 +209,11 @@ export default function PrivacyPage() {
       </p>
       <ul>
         <li>
-          <strong>Email</strong>: privacy@suncampgear.com
+          <strong>Email</strong>: privacy@soltrek.in
         </li>
         <li>
-          <strong>Address</strong>: SunCamp Gear, 12, Tech Park Road,
-          Whitefield, Bengaluru – 560066
+          <strong>Address</strong>: SolTrek, 12, Tech Park Road, Whitefield,
+          Bengaluru – 560066
         </li>
       </ul>
     </PolicyLayout>

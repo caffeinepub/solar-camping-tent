@@ -3,7 +3,7 @@ import PolicyLayout from "./PolicyLayout";
 
 export default function ReturnsPage() {
   useEffect(() => {
-    document.title = "Returns & Refunds Policy | SunCamp Gear";
+    document.title = "Returns & Refunds Policy | SolTrek";
   }, []);
 
   return (
@@ -14,10 +14,10 @@ export default function ReturnsPage() {
     >
       <h2>Our Return Promise</h2>
       <p>
-        At SunCamp Gear, we stand behind the quality of everything we sell. If
-        you're not completely satisfied with your purchase, we offer a
-        straightforward <strong>7-day return window</strong> from the date of
-        delivery — no questions asked for unused items.
+        At SolTrek, we stand behind the quality of everything we sell. If you're
+        not completely satisfied with your purchase, we offer a straightforward{" "}
+        <strong>7-day return window</strong> from the date of delivery — no
+        questions asked for unused items.
       </p>
 
       <h2>Return Eligibility</h2>
@@ -62,7 +62,7 @@ export default function ReturnsPage() {
       </p>
       <p>
         To report a defective item, please email us at{" "}
-        <strong>support@suncampgear.com</strong> with:
+        <strong>support@soltrek.in</strong> with:
       </p>
       <ul>
         <li>Your order number</li>
@@ -77,8 +77,8 @@ export default function ReturnsPage() {
       <h2>How to Initiate a Return</h2>
       <ol>
         <li>
-          Email <strong>support@suncampgear.com</strong> with your order number
-          and reason for return
+          Email <strong>support@soltrek.in</strong> with your order number and
+          reason for return
         </li>
         <li>
           Our team will review your request and send you a{" "}
@@ -147,7 +147,7 @@ export default function ReturnsPage() {
 
       <h2>Warranty Claims</h2>
       <p>
-        All SunCamp Solar Tents come with a{" "}
+        All SolTrek Solar Tents come with a{" "}
         <strong>1-year manufacturing defect warranty</strong>. Warranty claims
         cover:
       </p>
@@ -171,7 +171,7 @@ export default function ReturnsPage() {
       <p>For return and refund queries, please contact:</p>
       <ul>
         <li>
-          <strong>Email</strong>: support@suncampgear.com
+          <strong>Email</strong>: support@soltrek.in
         </li>
         <li>
           <strong>Phone</strong>: +91 98765 43210 (Mon–Sat, 9AM–7PM IST)
