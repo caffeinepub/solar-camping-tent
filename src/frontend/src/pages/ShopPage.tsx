@@ -54,7 +54,7 @@ const PRODUCTS: Product[] = [
     id: 1n,
     name: "SolTrek Solo Solar Camping Tent",
     category: "Solar Camping Tent",
-    price: 5999,
+    price: 7999,
     description:
       "1-person solar tent with 1W panel, USB charging, and 60-second setup. Perfect for solo trekkers.",
     rating: 4.8,
@@ -67,7 +67,7 @@ const PRODUCTS: Product[] = [
     id: 2n,
     name: "SolTrek Duo Solar Tent",
     category: "Solar Camping Tent",
-    price: 8999,
+    price: 9999,
     description:
       "2-person solar tent with 2W panel, dual USB ports, and reinforced waterproof fabric.",
     rating: 4.7,

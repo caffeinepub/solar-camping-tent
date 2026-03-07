@@ -1,6 +1,6 @@
 import type { OrderView } from "@/backend";
 import { useActor } from "@/hooks/useActor";
-import { AlertCircle, IndianRupee, TrendingUp } from "lucide-react";
+import { AlertCircle, Download, IndianRupee, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Bar,
@@ -13,6 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { exportToExcel } from "../utils/exportImport";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-IN", {
@@ -124,6 +125,13 @@ export default function AdminAnalyticsPage() {
   const topProducts = computeTopProducts(orders);
   const acquisitionTrend = generateAcquisitionTrend();
 
+  const handleExportReport = () => {
+    // Export daily revenue summary
+    const headers = ["Day", "Revenue (INR)"];
+    const rows = dailyRevenue.map((d) => [d.day, d.revenue]);
+    exportToExcel("soltrek-analytics-report.csv", headers, rows);
+  };
+
   const revenueCards = [
     {
       label: "Revenue Today",
@@ -181,6 +189,25 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-4">
+      {/* Header with export */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-bold text-slate-900 text-sm">Sales Analytics</h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Revenue and performance overview
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleExportReport}
+          data-ocid="admin.analytics.export_button"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors shadow-sm"
+        >
+          <Download style={{ width: "13px", height: "13px" }} />
+          Export Report
+        </button>
+      </div>
+
       {/* Revenue Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {revenueCards.map((card) => {

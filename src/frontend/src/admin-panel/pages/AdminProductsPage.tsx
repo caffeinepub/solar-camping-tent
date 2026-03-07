@@ -1,7 +1,16 @@
 import type { ProductInventory } from "@/backend";
 import { useActor } from "@/hooks/useActor";
-import { AlertCircle, Check, Package, Pencil, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  AlertCircle,
+  Check,
+  Download,
+  Package,
+  Pencil,
+  Upload,
+  X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { exportToExcel, parseCSVImport } from "../utils/exportImport";
 
 function getStockStatus(stock: number): {
   label: string;
@@ -39,6 +48,8 @@ export default function AdminProductsPage() {
   const [editingId, setEditingId] = useState<bigint | null>(null);
   const [editValue, setEditValue] = useState("");
   const [savingId, setSavingId] = useState<bigint | null>(null);
+  const [importMessage, setImportMessage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!actor || isFetching) return;
@@ -49,6 +60,13 @@ export default function AdminProductsPage() {
       .catch(() => setError("Failed to load inventory."))
       .finally(() => setLoading(false));
   }, [actor, isFetching]);
+
+  // Auto-dismiss import success message after 3 seconds
+  useEffect(() => {
+    if (!importMessage) return;
+    const timer = setTimeout(() => setImportMessage(""), 3000);
+    return () => clearTimeout(timer);
+  }, [importMessage]);
 
   const lowStockProducts = products.filter((p) => Number(p.stock) < 10);
 
@@ -82,6 +100,50 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleExport = () => {
+    const headers = [
+      "Product ID",
+      "Product Name",
+      "Category",
+      "Price (INR)",
+      "Stock",
+      "Status",
+    ];
+    const rows = products.map((p) => {
+      const stockNum = Number(p.stock);
+      const status = getStockStatus(stockNum);
+      return [
+        Number(p.productId),
+        p.productName,
+        p.category,
+        p.price,
+        stockNum,
+        status.label,
+      ];
+    });
+    exportToExcel("soltrek-inventory.csv", headers, rows);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const rows = await parseCSVImport(file);
+      const dataRows = rows.length > 1 ? rows.length - 1 : rows.length;
+      setImportMessage(
+        `${dataRows} product${dataRows !== 1 ? "s" : ""} imported successfully`,
+      );
+    } catch {
+      setImportMessage("Failed to read file. Please check the CSV format.");
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Low stock alert */}
@@ -101,16 +163,68 @@ export default function AdminProductsPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-between">
-        <div>
-          <h2 className="font-bold text-slate-900 text-sm">
-            Product Inventory
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            {products.length} products
-          </p>
+      {/* Header with export/import */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="font-bold text-slate-900 text-sm">
+              Product Inventory
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {products.length} products
+            </p>
+          </div>
+
+          {/* Export / Import buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleExport}
+              data-ocid="admin.products.export_button"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors shadow-sm"
+            >
+              <Download style={{ width: "13px", height: "13px" }} />
+              Export Inventory
+            </button>
+            <button
+              type="button"
+              onClick={handleImportClick}
+              data-ocid="admin.products.import_button"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold transition-colors"
+            >
+              <Upload style={{ width: "13px", height: "13px" }} />
+              Import
+            </button>
+            {/* Hidden file input for CSV import */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={handleImportFile}
+              data-ocid="admin.products.upload_button"
+              className="hidden"
+              aria-label="Import inventory CSV file"
+            />
+          </div>
         </div>
+
+        {/* Import success / error message */}
+        {importMessage && (
+          <div
+            className={`mt-3 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold ${
+              importMessage.includes("Failed")
+                ? "bg-red-50 text-red-700 border border-red-200"
+                : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+            }`}
+          >
+            {importMessage.includes("Failed") ? (
+              <AlertCircle style={{ width: "14px", height: "14px" }} />
+            ) : (
+              <span className="text-emerald-600">✓</span>
+            )}
+            {importMessage}
+          </div>
+        )}
       </div>
 
       {/* Table */}

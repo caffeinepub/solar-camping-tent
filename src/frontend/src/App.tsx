@@ -161,7 +161,7 @@ function Hero() {
           {[
             { value: "1W", label: "Solar Panel" },
             { value: "1.8kg", label: "Total Weight" },
-            { value: "₹5,999", label: "Launch Price" },
+            { value: "₹7,999", label: "Launch Price" },
             { value: "60s", label: "Setup Time" },
           ].map((stat) => (
             <div key={stat.label} className="text-center px-6 py-4">
@@ -487,7 +487,7 @@ const testimonials = [
     initials: "AB",
     stars: 4,
     quote:
-      "Weekend camping in Coorg — tent was perfect. Charged my phone and camera battery over the weekend. The setup instructions are super clear. Great value at ₹5,999.",
+      "Weekend camping in Coorg — tent was perfect. Charged my phone and camera battery over the weekend. The setup instructions are super clear. Great value at ₹7,999.",
   },
 ];
 
@@ -573,7 +573,7 @@ const pricingTiers: PricingTier[] = [
   {
     id: "solo",
     name: "Solo",
-    price: "₹5,999",
+    price: "₹7,999",
     ocid: "pricing.item.1",
     btnOcid: "pricing.solo.button",
     features: [
@@ -588,7 +588,7 @@ const pricingTiers: PricingTier[] = [
   {
     id: "duo",
     name: "Duo",
-    price: "₹8,999",
+    price: "₹9,999",
     recommended: true,
     ocid: "pricing.item.2",
     btnOcid: "pricing.duo.button",

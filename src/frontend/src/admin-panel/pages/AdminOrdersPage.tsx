@@ -1,7 +1,8 @@
 import type { OrderView } from "@/backend";
 import { useActor } from "@/hooks/useActor";
-import { AlertCircle, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { AlertCircle, Download, Search, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { exportToExcel, parseCSVImport } from "../utils/exportImport";
 
 type StatusFilter = "All" | "Pending" | "Shipped" | "Delivered" | "Cancelled";
 
@@ -47,6 +48,8 @@ export default function AdminOrdersPage() {
   const [activeFilter, setActiveFilter] = useState<StatusFilter>("All");
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [importMessage, setImportMessage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!actor || isFetching) return;
@@ -57,6 +60,13 @@ export default function AdminOrdersPage() {
       .catch(() => setError("Failed to load orders."))
       .finally(() => setLoading(false));
   }, [actor, isFetching]);
+
+  // Auto-dismiss import success message after 3 seconds
+  useEffect(() => {
+    if (!importMessage) return;
+    const timer = setTimeout(() => setImportMessage(""), 3000);
+    return () => clearTimeout(timer);
+  }, [importMessage]);
 
   const handleStatusChange = async (orderId: bigint, newStatus: string) => {
     setUpdatingId(Number(orderId));
@@ -85,51 +95,163 @@ export default function AdminOrdersPage() {
     return matchesFilter && matchesSearch;
   });
 
+  const handleExport = () => {
+    const headers = [
+      "Order ID",
+      "Customer Name",
+      "Email",
+      "Phone",
+      "Products",
+      "Amount (INR)",
+      "Payment Method",
+      "Status",
+      "Date",
+    ];
+    const rows = filtered.map((o) => {
+      const total = o.cartItems.reduce(
+        (sum, item) => sum + item.price * Number(item.quantity),
+        0,
+      );
+      const products = o.cartItems
+        .map((item) => `${item.productName} x${Number(item.quantity)}`)
+        .join(" | ");
+      return [
+        Number(o.orderId),
+        o.customerName,
+        o.email,
+        o.phone,
+        products,
+        total,
+        o.paymentMethod,
+        o.status,
+        getMockDate(Number(o.orderId)),
+      ];
+    });
+    exportToExcel("soltrek-orders.csv", headers, rows);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const rows = await parseCSVImport(file);
+      // Subtract 1 for the header row
+      const dataRows = rows.length > 1 ? rows.length - 1 : rows.length;
+      setImportMessage(
+        `${dataRows} order${dataRows !== 1 ? "s" : ""} imported successfully`,
+      );
+    } catch {
+      setImportMessage("Failed to read file. Please check the CSV format.");
+    } finally {
+      // Reset input so the same file can be re-imported
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="bg-white rounded-2xl border border-slate-200 p-4">
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-          {/* Filter Tabs */}
-          <div className="flex gap-1.5 flex-wrap">
-            {STATUS_FILTERS.map((filter) => (
+        <div className="flex flex-col gap-3">
+          {/* Row 1: Filter tabs + action buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+            {/* Filter Tabs */}
+            <div className="flex gap-1.5 flex-wrap">
+              {STATUS_FILTERS.map((filter) => (
+                <button
+                  key={filter}
+                  type="button"
+                  data-ocid="admin.orders.tab"
+                  onClick={() => setActiveFilter(filter)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                    activeFilter === filter
+                      ? "bg-indigo-600 text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {filter}
+                  {filter !== "All" && (
+                    <span className="ml-1.5 opacity-70">
+                      ({orders.filter((o) => o.status === filter).length})
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Export / Import buttons */}
+            <div className="flex items-center gap-2 flex-shrink-0">
               <button
-                key={filter}
                 type="button"
-                data-ocid="admin.orders.tab"
-                onClick={() => setActiveFilter(filter)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
-                  activeFilter === filter
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+                onClick={handleExport}
+                data-ocid="admin.orders.export_button"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors shadow-sm"
               >
-                {filter}
-                {filter !== "All" && (
-                  <span className="ml-1.5 opacity-70">
-                    ({orders.filter((o) => o.status === filter).length})
-                  </span>
-                )}
+                <Download style={{ width: "13px", height: "13px" }} />
+                Export Orders
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={handleImportClick}
+                data-ocid="admin.orders.import_button"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold transition-colors"
+              >
+                <Upload style={{ width: "13px", height: "13px" }} />
+                Import Orders
+              </button>
+              {/* Hidden file input for CSV import */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv"
+                onChange={handleImportFile}
+                data-ocid="admin.orders.upload_button"
+                className="hidden"
+                aria-label="Import orders CSV file"
+              />
+            </div>
           </div>
 
-          {/* Search */}
-          <div className="relative w-full sm:w-64">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              style={{ width: "14px", height: "14px" }}
-            />
-            <input
-              type="text"
-              placeholder="Search by name or order ID…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              data-ocid="admin.orders.search_input"
-              className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-            />
+          {/* Row 2: Search */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-end">
+            <div className="relative w-full sm:w-64">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                style={{ width: "14px", height: "14px" }}
+              />
+              <input
+                type="text"
+                placeholder="Search by name or order ID…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                data-ocid="admin.orders.search_input"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+              />
+            </div>
           </div>
         </div>
+
+        {/* Import success / error message */}
+        {importMessage && (
+          <div
+            className={`mt-3 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold ${
+              importMessage.includes("Failed")
+                ? "bg-red-50 text-red-700 border border-red-200"
+                : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+            }`}
+          >
+            {importMessage.includes("Failed") ? (
+              <AlertCircle style={{ width: "14px", height: "14px" }} />
+            ) : (
+              <span className="text-emerald-600">✓</span>
+            )}
+            {importMessage}
+          </div>
+        )}
       </div>
 
       {/* Table */}
