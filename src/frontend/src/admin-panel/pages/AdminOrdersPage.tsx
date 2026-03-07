@@ -53,12 +53,67 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     if (!actor || isFetching) return;
+
+    // Auto-advance Pending orders to Shipped after 30 minutes
+    const shipEligible = async (currentOrders: OrderView[]) => {
+      let storedTimes: Record<string, number> = {};
+      try {
+        storedTimes = JSON.parse(
+          localStorage.getItem("soltrek_order_times") || "{}",
+        );
+      } catch {
+        return;
+      }
+      const now = Date.now();
+      const THIRTY_MIN = 30 * 60 * 1000;
+      const toShip = currentOrders.filter((o) => {
+        if (o.status !== "Pending") return false;
+        const placedAt = storedTimes[String(o.orderId)];
+        return placedAt !== undefined && now - placedAt >= THIRTY_MIN;
+      });
+      for (const order of toShip) {
+        try {
+          await actor.updateOrderStatus(order.orderId, "Shipped");
+        } catch {
+          // silently skip
+        }
+      }
+      if (toShip.length > 0) {
+        setOrders((prev) =>
+          prev.map((o) =>
+            toShip.some((s) => s.orderId === o.orderId)
+              ? { ...o, status: "Shipped" }
+              : o,
+          ),
+        );
+      }
+    };
+
     setLoading(true);
     actor
       .getAllOrders()
-      .then(setOrders)
+      .then(async (fetchedOrders) => {
+        setOrders(fetchedOrders);
+        await shipEligible(fetchedOrders);
+      })
       .catch(() => setError("Failed to load orders."))
       .finally(() => setLoading(false));
+
+    // Poll every 2 minutes to auto-advance newly eligible orders
+    const interval = setInterval(
+      async () => {
+        try {
+          const latest = await actor.getAllOrders();
+          setOrders(latest);
+          await shipEligible(latest);
+        } catch {
+          // ignore polling errors
+        }
+      },
+      2 * 60 * 1000,
+    );
+
+    return () => clearInterval(interval);
   }, [actor, isFetching]);
 
   // Auto-dismiss import success message after 3 seconds

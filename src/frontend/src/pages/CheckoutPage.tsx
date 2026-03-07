@@ -1244,7 +1244,7 @@ export default function CheckoutPage() {
           BigInt(1),
         );
         // Place the order
-        await actor.placeOrder(
+        const orderResult = await actor.placeOrder(
           sid,
           form.name,
           form.email,
@@ -1255,6 +1255,17 @@ export default function CheckoutPage() {
           form.pincode,
           pid, // payment method = payment ID for traceability
         );
+        // Record placement timestamp so admin panel can auto-advance to Shipped after 30 min
+        try {
+          const stored = JSON.parse(
+            localStorage.getItem("soltrek_order_times") || "{}",
+          );
+          // orderResult is the new orderId (bigint)
+          stored[String(orderResult)] = Date.now();
+          localStorage.setItem("soltrek_order_times", JSON.stringify(stored));
+        } catch {
+          // ignore storage errors
+        }
       } catch {
         // Order save failed silently — payment already succeeded
       }
