@@ -14,7 +14,8 @@ import { useEffect } from "react";
 import { useCart } from "../contexts/CartContext";
 
 export default function CartPage() {
-  const { items, totalItems, totalPrice, addItem, removeItem } = useCart();
+  const { items, totalItems, totalPrice, updateQuantity, removeItem } =
+    useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -97,16 +98,9 @@ export default function CartPage() {
                         type="button"
                         aria-label="Decrease quantity"
                         data-ocid={`cart.quantity.button.${i + 1}`}
-                        onClick={() => {
-                          if (item.quantity <= 1) {
-                            removeItem(item.productId);
-                          } else {
-                            addItem({
-                              ...item,
-                              quantity: item.quantity - 2, // Will add -1 on top of existing
-                            });
-                          }
-                        }}
+                        onClick={() =>
+                          updateQuantity(item.productId, item.quantity - 1)
+                        }
                         className="w-8 h-8 flex items-center justify-center hover:bg-earth transition-colors text-foreground"
                       >
                         <Minus className="w-3.5 h-3.5" />
@@ -117,7 +111,9 @@ export default function CartPage() {
                       <button
                         type="button"
                         aria-label="Increase quantity"
-                        onClick={() => addItem({ ...item, quantity: 1 })}
+                        onClick={() =>
+                          updateQuantity(item.productId, item.quantity + 1)
+                        }
                         className="w-8 h-8 flex items-center justify-center hover:bg-earth transition-colors text-foreground"
                       >
                         <Plus className="w-3.5 h-3.5" />

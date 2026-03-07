@@ -23,6 +23,7 @@ interface CartContextType {
   totalPrice: number;
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
   removeItem: (productId: bigint) => void;
+  updateQuantity: (productId: bigint, quantity: number) => void;
   clearCart: () => void;
   isLoading: boolean;
 }
@@ -111,6 +112,42 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [actor, sessionId],
   );
 
+  const updateQuantity = useCallback(
+    (productId: bigint, quantity: number) => {
+      if (quantity <= 0) {
+        setItems((prev) => prev.filter((i) => i.productId !== productId));
+        if (actor) {
+          actor.removeFromCart(sessionId, productId).catch(() => {});
+        }
+        return;
+      }
+      setItems((prev) =>
+        prev.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
+      );
+      // Sync to backend: remove then re-add with new quantity
+      if (actor) {
+        actor
+          .removeFromCart(sessionId, productId)
+          .then(() => {
+            const item = items.find((i) => i.productId === productId);
+            if (item) {
+              actor
+                .addToCart(
+                  sessionId,
+                  productId,
+                  item.productName,
+                  item.price,
+                  BigInt(quantity),
+                )
+                .catch(() => {});
+            }
+          })
+          .catch(() => {});
+      }
+    },
+    [actor, sessionId, items],
+  );
+
   const removeItem = useCallback(
     (productId: bigint) => {
       setItems((prev) => prev.filter((i) => i.productId !== productId));
@@ -144,6 +181,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         totalPrice,
         addItem,
         removeItem,
+        updateQuantity,
         clearCart,
         isLoading,
       }}
