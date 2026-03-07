@@ -14,6 +14,7 @@ import { useActor } from "@/hooks/useActor";
 import {
   ArrowLeft,
   Check,
+  CheckCircle2,
   ChevronRight,
   CreditCard,
   Home,
@@ -22,10 +23,12 @@ import {
   Shield,
   Smartphone,
   Sun,
+  Tag,
   X,
+  XCircle,
   Zap,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 
 /* ─── Indian States ─────────────────────────────────────────── */
@@ -124,6 +127,32 @@ const PLANS: Record<string, Plan> = {
   },
 };
 
+/* ─── Coupon definitions (mirrors CartPage) ─────────────────── */
+type Coupon = {
+  code: string;
+  type: "percent" | "flat";
+  value: number;
+  label: string;
+};
+const VALID_COUPONS: Coupon[] = [
+  { code: "SOLAR10", type: "percent", value: 10, label: "10% off" },
+  { code: "SOLTREK15", type: "percent", value: 15, label: "15% off" },
+  { code: "CAMP500", type: "flat", value: 500, label: "₹500 off" },
+  {
+    code: "FIRST20",
+    type: "percent",
+    value: 20,
+    label: "20% off on first order",
+  },
+];
+
+function calcDiscount(coupon: Coupon | null, subtotal: number): number {
+  if (!coupon) return 0;
+  return coupon.type === "percent"
+    ? Math.round((subtotal * coupon.value) / 100)
+    : Math.min(coupon.value, subtotal);
+}
+
 /* ─── Dummy Razorpay Modal ───────────────────────────────────── */
 type PaymentTab = "upi" | "card" | "netbanking" | "wallet" | "emi";
 
@@ -151,18 +180,20 @@ const EMI_OPTIONS = [
 ];
 
 function DummyRazorpayModal({
-  plan,
+  finalPrice,
   customerName,
   customerEmail,
   onSuccess,
   onDismiss,
 }: {
   plan: Plan;
+  finalPrice: number;
   customerName: string;
   customerEmail: string;
   onSuccess: (paymentId: string) => void;
   onDismiss: () => void;
 }) {
+  const displayFinal = `₹${finalPrice.toLocaleString("en-IN")}`;
   const [activeTab, setActiveTab] = useState<PaymentTab>("upi");
   const [upiId, setUpiId] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -301,7 +332,7 @@ function DummyRazorpayModal({
             <div className="text-right">
               <div className="text-white/70 text-[11px]">Amount</div>
               <div className="text-white font-black text-base">
-                {plan.displayPrice}
+                {displayFinal}
               </div>
             </div>
             <button
@@ -412,7 +443,7 @@ function DummyRazorpayModal({
                         Processing…
                       </>
                     ) : (
-                      <>Pay {plan.displayPrice}</>
+                      <>Pay {displayFinal}</>
                     )}
                   </Button>
                 </div>
@@ -530,7 +561,7 @@ function DummyRazorpayModal({
                     Processing…
                   </>
                 ) : (
-                  <>Pay {plan.displayPrice}</>
+                  <>Pay {displayFinal}</>
                 )}
               </Button>
 
@@ -590,7 +621,7 @@ function DummyRazorpayModal({
                     Redirecting to Bank…
                   </>
                 ) : (
-                  <>Pay {plan.displayPrice}</>
+                  <>Pay {displayFinal}</>
                 )}
               </Button>
             </div>
@@ -639,7 +670,7 @@ function DummyRazorpayModal({
                     Processing…
                   </>
                 ) : (
-                  <>Pay {plan.displayPrice}</>
+                  <>Pay {displayFinal}</>
                 )}
               </Button>
             </div>
@@ -651,7 +682,7 @@ function DummyRazorpayModal({
               <p className="text-sm font-bold text-gray-800">EMI Options</p>
               <div className="space-y-2">
                 {EMI_OPTIONS.map((emi) => {
-                  const monthlyAmount = Math.ceil(plan.price / emi.months);
+                  const monthlyAmount = Math.ceil(finalPrice / emi.months);
                   const emiKey = `${emi.months}-${emi.bank}`;
                   return (
                     <button
@@ -703,7 +734,7 @@ function DummyRazorpayModal({
                     Processing…
                   </>
                 ) : (
-                  <>Pay {plan.displayPrice}</>
+                  <>Pay {displayFinal}</>
                 )}
               </Button>
             </div>
@@ -745,7 +776,41 @@ function TrustBadges() {
 }
 
 /* ─── Order Summary ──────────────────────────────────────────── */
-function OrderSummary({ plan }: { plan: Plan }) {
+function OrderSummary({
+  plan,
+  appliedCoupon,
+  discountAmount,
+  finalPrice,
+  onCouponApplied,
+  onCouponRemoved,
+}: {
+  plan: Plan;
+  appliedCoupon: Coupon | null;
+  discountAmount: number;
+  finalPrice: number;
+  onCouponApplied: (coupon: Coupon) => void;
+  onCouponRemoved: () => void;
+}) {
+  const [couponInput, setCouponInput] = useState("");
+  const [couponError, setCouponError] = useState("");
+
+  const handleApply = () => {
+    const code = couponInput.trim().toUpperCase();
+    const found = VALID_COUPONS.find((c) => c.code === code);
+    if (!found) {
+      setCouponError("Invalid coupon code. Please try again.");
+      return;
+    }
+    setCouponError("");
+    onCouponApplied(found);
+  };
+
+  const handleRemove = () => {
+    setCouponInput("");
+    setCouponError("");
+    onCouponRemoved();
+  };
+
   return (
     <Card className="border-border shadow-nature-sm">
       <CardHeader className="pb-3">
@@ -787,11 +852,28 @@ function OrderSummary({ plan }: { plan: Plan }) {
 
         <div className="space-y-1.5 text-sm">
           <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Subtotal</span>
+            <span className="font-semibold text-foreground">
+              ₹{plan.price.toLocaleString("en-IN")}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Delivery</span>
             <span className="font-semibold text-forest text-xs">
               FREE across India
             </span>
           </div>
+          {appliedCoupon && discountAmount > 0 && (
+            <div className="flex items-center justify-between text-green-700">
+              <span className="flex items-center gap-1 font-semibold text-xs">
+                <Tag className="w-3 h-3" />
+                Coupon ({appliedCoupon.code})
+              </span>
+              <span className="font-bold text-xs">
+                −₹{discountAmount.toLocaleString("en-IN")}
+              </span>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Return Policy</span>
             <span className="font-semibold text-xs text-muted-foreground">
@@ -800,13 +882,81 @@ function OrderSummary({ plan }: { plan: Plan }) {
           </div>
         </div>
 
+        {/* Coupon input */}
+        <div className="space-y-2">
+          {!appliedCoupon ? (
+            <>
+              <div className="flex gap-2">
+                <Input
+                  data-ocid="checkout.coupon_input"
+                  placeholder="Coupon code"
+                  value={couponInput}
+                  onChange={(e) => {
+                    setCouponInput(e.target.value.toUpperCase());
+                    setCouponError("");
+                  }}
+                  onKeyDown={(e) => e.key === "Enter" && handleApply()}
+                  className="flex-1 text-sm uppercase tracking-wide"
+                />
+                <button
+                  type="button"
+                  data-ocid="checkout.coupon_apply_button"
+                  onClick={handleApply}
+                  className="px-3 py-2 text-xs font-bold rounded-md border border-forest text-forest hover:bg-forest hover:text-white transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+              {couponError && (
+                <div className="flex items-center gap-1.5 text-xs text-red-500">
+                  <XCircle className="w-3 h-3 flex-shrink-0" />
+                  {couponError}
+                </div>
+              )}
+              <p className="text-[11px] text-muted-foreground">
+                Try: SOLAR10 · SOLTREK15 · CAMP500 · FIRST20
+              </p>
+            </>
+          ) : (
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-green-50 border border-green-200">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-black text-green-800">
+                    {appliedCoupon.code}
+                  </p>
+                  <p className="text-[11px] text-green-600">
+                    {appliedCoupon.label} applied
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                data-ocid="checkout.coupon_remove_button"
+                onClick={handleRemove}
+                className="text-green-600 hover:text-red-500 transition-colors"
+                aria-label="Remove coupon"
+              >
+                <XCircle className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
+
         <Separator />
 
         <div className="flex items-center justify-between">
           <span className="font-black text-foreground text-base">Total</span>
-          <span className="font-display font-black text-2xl text-foreground">
-            {plan.displayPrice}
-          </span>
+          <div className="text-right">
+            {appliedCoupon && discountAmount > 0 && (
+              <p className="text-xs text-muted-foreground line-through">
+                ₹{plan.price.toLocaleString("en-IN")}
+              </p>
+            )}
+            <span className="font-display font-black text-2xl text-foreground">
+              ₹{finalPrice.toLocaleString("en-IN")}
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -815,12 +965,14 @@ function OrderSummary({ plan }: { plan: Plan }) {
 
 /* ─── Payment Section ────────────────────────────────────────── */
 function PaymentSection({
-  plan,
+  finalPrice,
   onPayNow,
 }: {
   plan: Plan;
+  finalPrice: number;
   onPayNow: () => void;
 }) {
+  const displayFinal = `₹${finalPrice.toLocaleString("en-IN")}`;
   return (
     <Card className="border-border shadow-nature-sm">
       <CardHeader className="pb-3">
@@ -864,7 +1016,7 @@ function PaymentSection({
           className="w-full bg-[#2D6FDB] hover:bg-[#1A5CC8] text-white font-black text-base py-6 rounded-xl transition-all duration-150 active:scale-[0.98] shadow-md hover:shadow-lg"
         >
           <Lock className="w-4 h-4 mr-2" />
-          Pay with Razorpay — {plan.displayPrice}
+          Pay with Razorpay — {displayFinal}
         </Button>
 
         {/* Payment Methods Strip */}
@@ -909,6 +1061,21 @@ type FormData = {
   pincode: string;
 };
 
+type FormErrors = Partial<Record<keyof FormData, string>>;
+
+function validateEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+function validatePhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  return digits.length === 10;
+}
+
+function validatePincode(pin: string) {
+  return /^\d{6}$/.test(pin);
+}
+
 function CustomerForm({
   form,
   setForm,
@@ -918,8 +1085,57 @@ function CustomerForm({
   setForm: (f: FormData) => void;
   onContinue: () => void;
 }) {
-  const set = (key: keyof FormData) => (val: string) =>
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<
+    Partial<Record<keyof FormData, boolean>>
+  >({});
+
+  const set = (key: keyof FormData) => (val: string) => {
     setForm({ ...form, [key]: val });
+    // Clear error on change
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
+  };
+
+  const touch = (key: keyof FormData) => () =>
+    setTouched((prev) => ({ ...prev, [key]: true }));
+
+  const getFieldError = (
+    key: keyof FormData,
+    val: string,
+  ): string | undefined => {
+    if (!val)
+      return `${key === "pincode" ? "PIN code" : key.charAt(0).toUpperCase() + key.slice(1)} is required`;
+    if (key === "email" && !validateEmail(val))
+      return "Please enter a valid email address";
+    if (key === "phone" && !validatePhone(val))
+      return "Mobile number must be exactly 10 digits";
+    if (key === "pincode" && !validatePincode(val))
+      return "PIN code must be exactly 6 digits";
+    return undefined;
+  };
+
+  const handleContinue = () => {
+    const newErrors: FormErrors = (
+      Object.keys(form) as (keyof FormData)[]
+    ).reduce((acc, key) => {
+      const err = getFieldError(key, form[key]);
+      if (err) acc[key] = err;
+      return acc;
+    }, {} as FormErrors);
+    setErrors(newErrors);
+    const allTouched = (Object.keys(form) as (keyof FormData)[]).reduce(
+      (acc, k) => {
+        acc[k] = true;
+        return acc;
+      },
+      {} as Record<keyof FormData, boolean>,
+    );
+    setTouched(allTouched);
+    if (Object.keys(newErrors).length === 0) onContinue();
+  };
+
+  const fieldError = (key: keyof FormData) =>
+    touched[key] ? getFieldError(key, form[key]) : errors[key];
 
   return (
     <Card className="border-border shadow-nature-sm">
@@ -942,9 +1158,18 @@ function CustomerForm({
             placeholder="Rahul Sharma"
             value={form.name}
             onChange={(e) => set("name")(e.target.value)}
+            onBlur={touch("name")}
             autoComplete="name"
             required
+            className={
+              fieldError("name")
+                ? "border-red-500 focus-visible:ring-red-400"
+                : ""
+            }
           />
+          {fieldError("name") && (
+            <p className="text-xs text-red-500 mt-0.5">{fieldError("name")}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -962,27 +1187,52 @@ function CustomerForm({
               placeholder="rahul@example.com"
               value={form.email}
               onChange={(e) => set("email")(e.target.value)}
+              onBlur={touch("email")}
               autoComplete="email"
               required
+              className={
+                fieldError("email")
+                  ? "border-red-500 focus-visible:ring-red-400"
+                  : ""
+              }
             />
+            {fieldError("email") && (
+              <p className="text-xs text-red-500 mt-0.5">
+                {fieldError("email")}
+              </p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label
               htmlFor="phone"
               className="text-sm font-semibold text-foreground"
             >
-              Phone Number *
+              Mobile Number *
             </Label>
             <Input
               id="phone"
               type="tel"
               data-ocid="checkout.phone_input"
-              placeholder="+91 9XXXXXXXXX"
+              placeholder="9876543210"
               value={form.phone}
-              onChange={(e) => set("phone")(e.target.value)}
+              onChange={(e) =>
+                set("phone")(e.target.value.replace(/\D/g, "").slice(0, 10))
+              }
+              onBlur={touch("phone")}
               autoComplete="tel"
+              maxLength={10}
               required
+              className={
+                fieldError("phone")
+                  ? "border-red-500 focus-visible:ring-red-400"
+                  : ""
+              }
             />
+            {fieldError("phone") && (
+              <p className="text-xs text-red-500 mt-0.5">
+                {fieldError("phone")}
+              </p>
+            )}
           </div>
         </div>
 
@@ -999,9 +1249,20 @@ function CustomerForm({
             placeholder="Flat / House No., Street, Locality"
             value={form.address}
             onChange={(e) => set("address")(e.target.value)}
+            onBlur={touch("address")}
             autoComplete="street-address"
             required
+            className={
+              fieldError("address")
+                ? "border-red-500 focus-visible:ring-red-400"
+                : ""
+            }
           />
+          {fieldError("address") && (
+            <p className="text-xs text-red-500 mt-0.5">
+              {fieldError("address")}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1018,9 +1279,20 @@ function CustomerForm({
               placeholder="Mumbai"
               value={form.city}
               onChange={(e) => set("city")(e.target.value)}
+              onBlur={touch("city")}
               autoComplete="address-level2"
               required
+              className={
+                fieldError("city")
+                  ? "border-red-500 focus-visible:ring-red-400"
+                  : ""
+              }
             />
+            {fieldError("city") && (
+              <p className="text-xs text-red-500 mt-0.5">
+                {fieldError("city")}
+              </p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label
@@ -1029,11 +1301,17 @@ function CustomerForm({
             >
               State *
             </Label>
-            <Select value={form.state} onValueChange={set("state")}>
+            <Select
+              value={form.state}
+              onValueChange={(val) => {
+                set("state")(val);
+                setTouched((prev) => ({ ...prev, state: true }));
+              }}
+            >
               <SelectTrigger
                 id="state"
                 data-ocid="checkout.state_select"
-                className="w-full"
+                className={`w-full ${fieldError("state") ? "border-red-500 focus:ring-red-400" : ""}`}
               >
                 <SelectValue placeholder="Select state" />
               </SelectTrigger>
@@ -1045,6 +1323,11 @@ function CustomerForm({
                 ))}
               </SelectContent>
             </Select>
+            {fieldError("state") && (
+              <p className="text-xs text-red-500 mt-0.5">
+                {fieldError("state")}
+              </p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label
@@ -1062,15 +1345,26 @@ function CustomerForm({
               onChange={(e) =>
                 set("pincode")(e.target.value.replace(/\D/g, "").slice(0, 6))
               }
+              onBlur={touch("pincode")}
               autoComplete="postal-code"
               required
+              className={
+                fieldError("pincode")
+                  ? "border-red-500 focus-visible:ring-red-400"
+                  : ""
+              }
             />
+            {fieldError("pincode") && (
+              <p className="text-xs text-red-500 mt-0.5">
+                {fieldError("pincode")}
+              </p>
+            )}
           </div>
         </div>
 
         <Button
           data-ocid="checkout.continue_button"
-          onClick={onContinue}
+          onClick={handleContinue}
           className="w-full md:hidden btn-amber-stamp bg-amber-brand hover:bg-amber-dark text-accent-foreground font-bold transition-all duration-150 active:scale-[0.98]"
         >
           Continue to Payment
@@ -1086,11 +1380,17 @@ function SuccessState({
   plan,
   name,
   paymentId,
+  finalPrice,
+  discountAmount,
+  couponCode,
   onGoHome,
 }: {
   plan: Plan;
   name: string;
   paymentId?: string;
+  finalPrice: number;
+  discountAmount: number;
+  couponCode: string;
   onGoHome: () => void;
 }) {
   return (
@@ -1125,10 +1425,29 @@ function SuccessState({
                 SolarTent — {plan.name}
               </span>
             </div>
+            {discountAmount > 0 && (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Original Price</span>
+                  <span className="font-semibold text-foreground line-through text-muted-foreground">
+                    ₹{plan.price.toLocaleString("en-IN")}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm text-green-700">
+                  <span className="flex items-center gap-1 font-semibold">
+                    <Tag className="w-3.5 h-3.5" />
+                    Coupon {couponCode && `(${couponCode})`}
+                  </span>
+                  <span className="font-bold">
+                    −₹{discountAmount.toLocaleString("en-IN")}
+                  </span>
+                </div>
+              </>
+            )}
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Amount Paid</span>
-              <span className="font-black text-foreground">
-                {plan.displayPrice}
+              <span className="font-black text-foreground text-base">
+                ₹{finalPrice.toLocaleString("en-IN")}
               </span>
             </div>
             <div className="flex justify-between text-sm">
@@ -1171,15 +1490,18 @@ export default function CheckoutPage() {
   const planId = searchParams.get("plan") ?? "duo";
   const cartTotal = searchParams.get("total");
   const cartLabel = searchParams.get("label");
+  const urlCoupon = searchParams.get("coupon") ?? "";
+  const urlDiscount = Number(searchParams.get("discount") ?? 0);
+  const urlSubtotal = Number(searchParams.get("subtotal") ?? 0);
 
-  // If coming from cart, build a dynamic plan from the actual cart total
-  const plan: Plan =
-    planId === "cart" && cartTotal
+  // If coming from cart, build a dynamic plan from the actual cart subtotal
+  const basePlan: Plan =
+    planId === "cart" && (cartTotal || urlSubtotal)
       ? {
           id: "cart",
           name: cartLabel ?? "Cart",
-          price: Number(cartTotal),
-          displayPrice: `₹${Number(cartTotal).toLocaleString("en-IN")}`,
+          price: urlSubtotal || Number(cartTotal),
+          displayPrice: `₹${(urlSubtotal || Number(cartTotal)).toLocaleString("en-IN")}`,
           features: [
             "All items from your cart",
             "Free shipping across India",
@@ -1188,7 +1510,34 @@ export default function CheckoutPage() {
           ],
         }
       : (PLANS[planId] ?? PLANS.duo);
+
   const { actor } = useActor();
+
+  // Coupon state — pre-populate if coming from cart with an already-applied coupon
+  const initialCoupon = urlCoupon
+    ? (VALID_COUPONS.find((c) => c.code === urlCoupon) ?? null)
+    : null;
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(
+    initialCoupon,
+  );
+
+  const discountAmount = appliedCoupon
+    ? calcDiscount(appliedCoupon, basePlan.price)
+    : urlDiscount > 0 && initialCoupon
+      ? urlDiscount
+      : 0;
+  const finalPrice = basePlan.price - discountAmount;
+
+  // Keep plan.displayPrice always pointing at the original subtotal
+  const plan = basePlan;
+
+  const handleCouponApplied = useCallback((coupon: Coupon) => {
+    setAppliedCoupon(coupon);
+  }, []);
+
+  const handleCouponRemoved = useCallback(() => {
+    setAppliedCoupon(null);
+  }, []);
 
   const [form, setForm] = useState<FormData>({
     name: "",
@@ -1220,6 +1569,18 @@ export default function CheckoutPage() {
       toast.error("Please fill in all shipping details before payment.");
       return false;
     }
+    if (!validateEmail(form.email)) {
+      toast.error("Please enter a valid email address.");
+      return false;
+    }
+    if (!validatePhone(form.phone)) {
+      toast.error("Mobile number must be exactly 10 digits.");
+      return false;
+    }
+    if (!validatePincode(form.pincode)) {
+      toast.error("PIN code must be exactly 6 digits.");
+      return false;
+    }
     return true;
   };
 
@@ -1235,12 +1596,12 @@ export default function CheckoutPage() {
     if (actor) {
       try {
         const sid = sessionId.current;
-        // Add the selected product to cart first
+        // Add the selected product to cart first (use finalPrice so admin sees correct amount)
         await actor.addToCart(
           sid,
           BigInt(planId === "solo" ? 1 : planId === "duo" ? 2 : 3),
           `SolTrek ${plan.name} Solar Camping Tent`,
-          plan.price,
+          finalPrice,
           BigInt(1),
         );
         // Place the order
@@ -1283,6 +1644,9 @@ export default function CheckoutPage() {
         plan={plan}
         name={form.name}
         paymentId={paymentId}
+        finalPrice={finalPrice}
+        discountAmount={discountAmount}
+        couponCode={appliedCoupon?.code ?? ""}
         onGoHome={handleGoHome}
       />
     );
@@ -1333,9 +1697,20 @@ export default function CheckoutPage() {
           </h1>
           <p className="text-muted-foreground text-sm">
             Complete your order for the SolarTent {plan.name} Edition —{" "}
-            <span className="font-semibold text-foreground">
-              {plan.displayPrice}
-            </span>
+            {discountAmount > 0 ? (
+              <>
+                <span className="line-through text-muted-foreground mr-1">
+                  {plan.displayPrice}
+                </span>
+                <span className="font-semibold text-forest">
+                  ₹{finalPrice.toLocaleString("en-IN")}
+                </span>
+              </>
+            ) : (
+              <span className="font-semibold text-foreground">
+                {plan.displayPrice}
+              </span>
+            )}
           </p>
         </div>
 
@@ -1354,15 +1729,30 @@ export default function CheckoutPage() {
 
             {/* Payment section (mobile: below form) */}
             <div id="payment-section" className="lg:hidden">
-              <PaymentSection plan={plan} onPayNow={handlePayNow} />
+              <PaymentSection
+                plan={plan}
+                finalPrice={finalPrice}
+                onPayNow={handlePayNow}
+              />
             </div>
           </div>
 
           {/* Right: Order summary + payment */}
           <div className="space-y-6 lg:sticky lg:top-20">
-            <OrderSummary plan={plan} />
+            <OrderSummary
+              plan={plan}
+              appliedCoupon={appliedCoupon}
+              discountAmount={discountAmount}
+              finalPrice={finalPrice}
+              onCouponApplied={handleCouponApplied}
+              onCouponRemoved={handleCouponRemoved}
+            />
             <div className="hidden lg:block">
-              <PaymentSection plan={plan} onPayNow={handlePayNow} />
+              <PaymentSection
+                plan={plan}
+                finalPrice={finalPrice}
+                onPayNow={handlePayNow}
+              />
             </div>
           </div>
         </div>
@@ -1389,6 +1779,7 @@ export default function CheckoutPage() {
       {showModal && (
         <DummyRazorpayModal
           plan={plan}
+          finalPrice={finalPrice}
           customerName={form.name}
           customerEmail={form.email}
           onSuccess={handlePaymentSuccess}

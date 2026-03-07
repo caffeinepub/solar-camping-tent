@@ -963,10 +963,16 @@ const checkoutRoute = createRoute({
     plan: string;
     total?: number;
     label?: string;
+    coupon?: string;
+    discount?: number;
+    subtotal?: number;
   } => ({
     plan: (search.plan as string) ?? "duo",
     ...(search.total !== undefined && { total: Number(search.total) }),
     ...(search.label !== undefined && { label: search.label as string }),
+    ...(search.coupon !== undefined && { coupon: search.coupon as string }),
+    ...(search.discount !== undefined && { discount: Number(search.discount) }),
+    ...(search.subtotal !== undefined && { subtotal: Number(search.subtotal) }),
   }),
   component: () => (
     <>

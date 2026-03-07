@@ -1,22 +1,74 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
+  CheckCircle2,
   Minus,
   Plus,
   ShieldCheck,
   ShoppingBag,
+  Tag,
   Trash2,
   Truck,
+  XCircle,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "../contexts/CartContext";
+
+/* ─── Coupon definitions ─────────────────────────────────────── */
+type Coupon = {
+  code: string;
+  type: "percent" | "flat";
+  value: number;
+  label: string;
+};
+const VALID_COUPONS: Coupon[] = [
+  { code: "SOLAR10", type: "percent", value: 10, label: "10% off" },
+  { code: "SOLTREK15", type: "percent", value: 15, label: "15% off" },
+  { code: "CAMP500", type: "flat", value: 500, label: "₹500 off" },
+  {
+    code: "FIRST20",
+    type: "percent",
+    value: 20,
+    label: "20% off on first order",
+  },
+];
 
 export default function CartPage() {
   const { items, totalItems, totalPrice, updateQuantity, removeItem } =
     useCart();
   const navigate = useNavigate();
+
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [couponError, setCouponError] = useState("");
+
+  const discountAmount = appliedCoupon
+    ? appliedCoupon.type === "percent"
+      ? Math.round((totalPrice * appliedCoupon.value) / 100)
+      : Math.min(appliedCoupon.value, totalPrice)
+    : 0;
+  const finalTotal = totalPrice - discountAmount;
+
+  const handleApplyCoupon = () => {
+    const code = couponInput.trim().toUpperCase();
+    const found = VALID_COUPONS.find((c) => c.code === code);
+    if (!found) {
+      setCouponError("Invalid coupon code. Please try again.");
+      setAppliedCoupon(null);
+      return;
+    }
+    setAppliedCoupon(found);
+    setCouponError("");
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  };
 
   useEffect(() => {
     document.title = "Shopping Cart | SolTrek";
@@ -172,15 +224,97 @@ export default function CartPage() {
                   FREE (prepaid)
                 </span>
               </div>
+              {appliedCoupon && (
+                <div className="flex justify-between text-green-700">
+                  <span className="flex items-center gap-1 font-semibold">
+                    <Tag className="w-3.5 h-3.5" />
+                    Coupon ({appliedCoupon.code})
+                  </span>
+                  <span className="font-bold">
+                    −₹{discountAmount.toLocaleString("en-IN")}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Coupon input */}
+            <div className="space-y-2">
+              {!appliedCoupon ? (
+                <>
+                  <div className="flex gap-2">
+                    <Input
+                      data-ocid="cart.coupon_input"
+                      placeholder="Enter coupon code"
+                      value={couponInput}
+                      onChange={(e) => {
+                        setCouponInput(e.target.value.toUpperCase());
+                        setCouponError("");
+                      }}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && handleApplyCoupon()
+                      }
+                      className="flex-1 text-sm uppercase tracking-wide"
+                    />
+                    <Button
+                      type="button"
+                      data-ocid="cart.coupon_apply_button"
+                      variant="outline"
+                      onClick={handleApplyCoupon}
+                      className="font-bold border-forest text-forest hover:bg-forest hover:text-white"
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                  {couponError && (
+                    <div className="flex items-center gap-1.5 text-xs text-red-500">
+                      <XCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                      {couponError}
+                    </div>
+                  )}
+                  <p className="text-[11px] text-muted-foreground">
+                    Try: SOLAR10 · SOLTREK15 · CAMP500 · FIRST20
+                  </p>
+                </>
+              ) : (
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-green-50 border border-green-200">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-black text-green-800">
+                        {appliedCoupon.code}
+                      </p>
+                      <p className="text-[11px] text-green-600">
+                        {appliedCoupon.label} applied
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    data-ocid="cart.coupon_remove_button"
+                    onClick={handleRemoveCoupon}
+                    className="text-green-600 hover:text-red-500 transition-colors"
+                    aria-label="Remove coupon"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
 
             <Separator />
 
             <div className="flex justify-between items-center">
               <span className="font-black text-foreground">Total</span>
-              <span className="font-display font-black text-2xl text-foreground">
-                ₹{totalPrice.toLocaleString("en-IN")}
-              </span>
+              <div className="text-right">
+                {appliedCoupon && (
+                  <p className="text-xs text-muted-foreground line-through">
+                    ₹{totalPrice.toLocaleString("en-IN")}
+                  </p>
+                )}
+                <span className="font-display font-black text-2xl text-foreground">
+                  ₹{finalTotal.toLocaleString("en-IN")}
+                </span>
+              </div>
             </div>
 
             <Button
@@ -191,8 +325,11 @@ export default function CartPage() {
                   to: "/checkout",
                   search: {
                     plan: "cart",
-                    total: totalPrice,
+                    total: finalTotal,
                     label: `${totalItems} item${totalItems !== 1 ? "s" : ""}`,
+                    coupon: appliedCoupon?.code ?? "",
+                    discount: discountAmount,
+                    subtotal: totalPrice,
                   },
                 })
               }
