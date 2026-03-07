@@ -476,6 +476,32 @@ export default function ShopPage() {
         </div>
       </div>
 
+      {/* New Arrivals Section */}
+      <section
+        id="new-arrivals"
+        className="container max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-2"
+      >
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <span className="text-amber-brand font-black text-xs tracking-[0.2em] uppercase">
+              Just In
+            </span>
+            <h2 className="font-display font-black text-2xl sm:text-3xl text-foreground">
+              New Arrivals
+            </h2>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {PRODUCTS.filter((p) => p.badge === "New").map((product, i) => (
+            <ProductCard
+              key={product.id.toString()}
+              product={product}
+              index={i}
+            />
+          ))}
+        </div>
+      </section>
+
       {/* Products */}
       <main className="container max-w-6xl mx-auto px-4 sm:px-6 py-10">
         {activeCategory !== "All" ? (

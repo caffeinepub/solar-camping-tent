@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { ArrowUp, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 const footerLinks = {
   Products: [
     { label: "Solar Camping Tent", to: "/product/solar-camping-tent" },
     { label: "Shop All Gear", to: "/shop" },
-    { label: "New Arrivals", to: "/shop" },
+    { label: "New Arrivals", to: "/shop#new-arrivals" },
   ],
   Company: [
     { label: "About Us", to: "/about" },
@@ -76,12 +76,21 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      to={link.to}
-                      className="text-white/55 text-sm hover:text-amber-brand transition-colors duration-200"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.to.includes("#") ? (
+                      <a
+                        href={link.to}
+                        className="text-white/55 text-sm hover:text-amber-brand transition-colors duration-200"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.to}
+                        className="text-white/55 text-sm hover:text-amber-brand transition-colors duration-200"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -106,6 +115,16 @@ export default function Footer() {
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-white/40 text-xs">
           <p>© {currentYear} SolTrek. All rights reserved.</p>
+          <button
+            type="button"
+            data-ocid="footer.scroll_top_button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="flex items-center gap-1.5 hover:text-amber-brand transition-colors duration-200 cursor-pointer"
+            aria-label="Back to top"
+          >
+            <ArrowUp className="w-3.5 h-3.5" />
+            Back to top
+          </button>
           <a
             href={caffeineUrl}
             target="_blank"
