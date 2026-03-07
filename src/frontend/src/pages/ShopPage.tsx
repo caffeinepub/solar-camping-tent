@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "@tanstack/react-router";
-import { Filter, ShoppingCart, Star } from "lucide-react";
+import { Filter, ShoppingCart, Star, Zap } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useCart } from "../contexts/CartContext";
@@ -262,6 +262,17 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
     toast.success(`${product.name} added to cart!`);
   };
 
+  const handleBuyNow = () => {
+    navigate({
+      to: "/checkout",
+      search: {
+        plan: "cart",
+        total: product.price,
+        label: product.name,
+      },
+    });
+  };
+
   return (
     <article
       data-ocid={`shop.product.item.${index + 1}`}
@@ -321,6 +332,15 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
           >
             <ShoppingCart className="w-3.5 h-3.5" />
             Add to Cart
+          </Button>
+          <Button
+            size="sm"
+            data-ocid={`shop.buy_now.button.${index + 1}`}
+            onClick={handleBuyNow}
+            className="w-full bg-forest hover:bg-forest-dark text-primary-foreground font-bold text-xs transition-all duration-150 active:scale-[0.98] flex items-center justify-center gap-1.5"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            Buy Now
           </Button>
         </div>
       </div>
