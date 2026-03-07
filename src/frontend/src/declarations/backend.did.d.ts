@@ -10,11 +10,27 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface AdminStats {
+  'totalOrders' : bigint,
+  'revenue' : number,
+  'pendingOrders' : bigint,
+  'lowStockCount' : bigint,
+  'totalCustomers' : bigint,
+}
 export interface CartItem {
   'productId' : bigint,
   'productName' : string,
   'quantity' : bigint,
   'price' : number,
+}
+export interface CustomerView {
+  'totalOrders' : bigint,
+  'totalSpending' : number,
+  'city' : string,
+  'name' : string,
+  'lastOrderDate' : bigint,
+  'email' : string,
+  'phone' : string,
 }
 export interface OrderView {
   'customerName' : string,
@@ -29,6 +45,13 @@ export interface OrderView {
   'phone' : string,
   'pincode' : string,
 }
+export interface ProductInventory {
+  'productId' : bigint,
+  'productName' : string,
+  'stock' : bigint,
+  'category' : string,
+  'price' : number,
+}
 export interface Review {
   'reviewText' : string,
   'productId' : bigint,
@@ -42,9 +65,13 @@ export interface _SERVICE {
     undefined
   >,
   'clearCart' : ActorMethod<[string], undefined>,
+  'getAdminStats' : ActorMethod<[], AdminStats>,
+  'getAllCustomers' : ActorMethod<[], Array<CustomerView>>,
+  'getAllOrders' : ActorMethod<[], Array<OrderView>>,
   'getAverageRating' : ActorMethod<[bigint], number>,
   'getCart' : ActorMethod<[string], Array<CartItem>>,
   'getOrder' : ActorMethod<[bigint], [] | [OrderView]>,
+  'getProductInventory' : ActorMethod<[], Array<ProductInventory>>,
   'getReviews' : ActorMethod<[bigint], Array<Review>>,
   'getSubscriberCount' : ActorMethod<[], bigint>,
   'placeOrder' : ActorMethod<
@@ -54,6 +81,8 @@ export interface _SERVICE {
   'removeFromCart' : ActorMethod<[string, bigint], undefined>,
   'submitReview' : ActorMethod<[bigint, bigint, string, string], undefined>,
   'subscribe' : ActorMethod<[string], undefined>,
+  'updateInventory' : ActorMethod<[bigint, bigint], boolean>,
+  'updateOrderStatus' : ActorMethod<[bigint, string], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

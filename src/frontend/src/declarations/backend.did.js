@@ -8,6 +8,22 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const AdminStats = IDL.Record({
+  'totalOrders' : IDL.Nat,
+  'revenue' : IDL.Float64,
+  'pendingOrders' : IDL.Nat,
+  'lowStockCount' : IDL.Nat,
+  'totalCustomers' : IDL.Nat,
+});
+export const CustomerView = IDL.Record({
+  'totalOrders' : IDL.Nat,
+  'totalSpending' : IDL.Float64,
+  'city' : IDL.Text,
+  'name' : IDL.Text,
+  'lastOrderDate' : IDL.Int,
+  'email' : IDL.Text,
+  'phone' : IDL.Text,
+});
 export const CartItem = IDL.Record({
   'productId' : IDL.Nat,
   'productName' : IDL.Text,
@@ -27,6 +43,13 @@ export const OrderView = IDL.Record({
   'phone' : IDL.Text,
   'pincode' : IDL.Text,
 });
+export const ProductInventory = IDL.Record({
+  'productId' : IDL.Nat,
+  'productName' : IDL.Text,
+  'stock' : IDL.Nat,
+  'category' : IDL.Text,
+  'price' : IDL.Float64,
+});
 export const Review = IDL.Record({
   'reviewText' : IDL.Text,
   'productId' : IDL.Nat,
@@ -42,9 +65,13 @@ export const idlService = IDL.Service({
       [],
     ),
   'clearCart' : IDL.Func([IDL.Text], [], []),
+  'getAdminStats' : IDL.Func([], [AdminStats], ['query']),
+  'getAllCustomers' : IDL.Func([], [IDL.Vec(CustomerView)], ['query']),
+  'getAllOrders' : IDL.Func([], [IDL.Vec(OrderView)], ['query']),
   'getAverageRating' : IDL.Func([IDL.Nat], [IDL.Float64], ['query']),
   'getCart' : IDL.Func([IDL.Text], [IDL.Vec(CartItem)], ['query']),
   'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(OrderView)], ['query']),
+  'getProductInventory' : IDL.Func([], [IDL.Vec(ProductInventory)], ['query']),
   'getReviews' : IDL.Func([IDL.Nat], [IDL.Vec(Review)], ['query']),
   'getSubscriberCount' : IDL.Func([], [IDL.Nat], ['query']),
   'placeOrder' : IDL.Func(
@@ -65,11 +92,29 @@ export const idlService = IDL.Service({
   'removeFromCart' : IDL.Func([IDL.Text, IDL.Nat], [], []),
   'submitReview' : IDL.Func([IDL.Nat, IDL.Nat, IDL.Text, IDL.Text], [], []),
   'subscribe' : IDL.Func([IDL.Text], [], []),
+  'updateInventory' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Bool], []),
+  'updateOrderStatus' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Bool], []),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const AdminStats = IDL.Record({
+    'totalOrders' : IDL.Nat,
+    'revenue' : IDL.Float64,
+    'pendingOrders' : IDL.Nat,
+    'lowStockCount' : IDL.Nat,
+    'totalCustomers' : IDL.Nat,
+  });
+  const CustomerView = IDL.Record({
+    'totalOrders' : IDL.Nat,
+    'totalSpending' : IDL.Float64,
+    'city' : IDL.Text,
+    'name' : IDL.Text,
+    'lastOrderDate' : IDL.Int,
+    'email' : IDL.Text,
+    'phone' : IDL.Text,
+  });
   const CartItem = IDL.Record({
     'productId' : IDL.Nat,
     'productName' : IDL.Text,
@@ -89,6 +134,13 @@ export const idlFactory = ({ IDL }) => {
     'phone' : IDL.Text,
     'pincode' : IDL.Text,
   });
+  const ProductInventory = IDL.Record({
+    'productId' : IDL.Nat,
+    'productName' : IDL.Text,
+    'stock' : IDL.Nat,
+    'category' : IDL.Text,
+    'price' : IDL.Float64,
+  });
   const Review = IDL.Record({
     'reviewText' : IDL.Text,
     'productId' : IDL.Nat,
@@ -104,9 +156,17 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'clearCart' : IDL.Func([IDL.Text], [], []),
+    'getAdminStats' : IDL.Func([], [AdminStats], ['query']),
+    'getAllCustomers' : IDL.Func([], [IDL.Vec(CustomerView)], ['query']),
+    'getAllOrders' : IDL.Func([], [IDL.Vec(OrderView)], ['query']),
     'getAverageRating' : IDL.Func([IDL.Nat], [IDL.Float64], ['query']),
     'getCart' : IDL.Func([IDL.Text], [IDL.Vec(CartItem)], ['query']),
     'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(OrderView)], ['query']),
+    'getProductInventory' : IDL.Func(
+        [],
+        [IDL.Vec(ProductInventory)],
+        ['query'],
+      ),
     'getReviews' : IDL.Func([IDL.Nat], [IDL.Vec(Review)], ['query']),
     'getSubscriberCount' : IDL.Func([], [IDL.Nat], ['query']),
     'placeOrder' : IDL.Func(
@@ -127,6 +187,8 @@ export const idlFactory = ({ IDL }) => {
     'removeFromCart' : IDL.Func([IDL.Text, IDL.Nat], [], []),
     'submitReview' : IDL.Func([IDL.Nat, IDL.Nat, IDL.Text, IDL.Text], [], []),
     'subscribe' : IDL.Func([IDL.Text], [], []),
+    'updateInventory' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Bool], []),
+    'updateOrderStatus' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Bool], []),
   });
 };
 

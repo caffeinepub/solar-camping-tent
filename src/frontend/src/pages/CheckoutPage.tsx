@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useActor } from "@/hooks/useActor";
 import {
   ArrowLeft,
   Check,
@@ -24,7 +25,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 /* ─── Indian States ─────────────────────────────────────────── */
@@ -1169,6 +1170,7 @@ export default function CheckoutPage() {
   const searchParams = new URLSearchParams(window.location.search);
   const planId = searchParams.get("plan") ?? "duo";
   const plan = PLANS[planId] ?? PLANS.duo;
+  const { actor } = useActor();
 
   const [form, setForm] = useState<FormData>({
     name: "",
@@ -1183,6 +1185,9 @@ export default function CheckoutPage() {
   const [showModal, setShowModal] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [paymentId, setPaymentId] = useState<string>("");
+  const sessionId = useRef<string>(
+    `session_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+  );
 
   const validateForm = () => {
     if (
@@ -1205,9 +1210,37 @@ export default function CheckoutPage() {
     setShowModal(true);
   };
 
-  const handlePaymentSuccess = (pid: string) => {
+  const handlePaymentSuccess = async (pid: string) => {
     setShowModal(false);
     setPaymentId(pid);
+    // Save order to backend so admin panel can track it
+    if (actor) {
+      try {
+        const sid = sessionId.current;
+        // Add the selected product to cart first
+        await actor.addToCart(
+          sid,
+          BigInt(planId === "solo" ? 1 : planId === "duo" ? 2 : 3),
+          `SolTrek ${plan.name} Solar Camping Tent`,
+          plan.price,
+          BigInt(1),
+        );
+        // Place the order
+        await actor.placeOrder(
+          sid,
+          form.name,
+          form.email,
+          form.phone,
+          form.address,
+          form.city,
+          form.state,
+          form.pincode,
+          pid, // payment method = payment ID for traceability
+        );
+      } catch {
+        // Order save failed silently — payment already succeeded
+      }
+    }
     setIsSuccess(true);
   };
 

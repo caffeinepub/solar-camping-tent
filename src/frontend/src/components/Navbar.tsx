@@ -45,7 +45,7 @@ export default function Navbar() {
           data-ocid="nav.link.1"
         >
           <img
-            src="/assets/generated/soltrek-logo-transparent.dim_400x200.png"
+            src="/assets/generated/soltrek-logo-transparent.dim_400x400.png"
             alt="SolTrek logo"
             className="h-14 w-auto object-contain"
           />

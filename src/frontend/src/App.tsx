@@ -35,6 +35,13 @@ import {
   Zap,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import AdminLayout from "./admin-panel/components/AdminLayout";
+import AdminAnalyticsPage from "./admin-panel/pages/AdminAnalyticsPage";
+import AdminCustomersPage from "./admin-panel/pages/AdminCustomersPage";
+import AdminDashboardPage from "./admin-panel/pages/AdminDashboardPage";
+import AdminLoginPage from "./admin-panel/pages/AdminLoginPage";
+import AdminOrdersPage from "./admin-panel/pages/AdminOrdersPage";
+import AdminProductsPage from "./admin-panel/pages/AdminProductsPage";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import WhatsAppButton from "./components/WhatsAppButton";
@@ -1058,6 +1065,63 @@ const blogRoute = createRoute({
   ),
 });
 
+/* ─── Admin Routes ───────────────────────────────────────────── */
+const adminLoginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin-login",
+  component: AdminLoginPage,
+});
+
+const adminDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin-dashboard",
+  component: () => (
+    <AdminLayout pageTitle="Dashboard">
+      <AdminDashboardPage />
+    </AdminLayout>
+  ),
+});
+
+const adminOrdersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin-orders",
+  component: () => (
+    <AdminLayout pageTitle="Orders Management">
+      <AdminOrdersPage />
+    </AdminLayout>
+  ),
+});
+
+const adminCustomersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin-customers",
+  component: () => (
+    <AdminLayout pageTitle="Customer Database">
+      <AdminCustomersPage />
+    </AdminLayout>
+  ),
+});
+
+const adminProductsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin-products",
+  component: () => (
+    <AdminLayout pageTitle="Product Inventory">
+      <AdminProductsPage />
+    </AdminLayout>
+  ),
+});
+
+const adminAnalyticsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin-analytics",
+  component: () => (
+    <AdminLayout pageTitle="Analytics">
+      <AdminAnalyticsPage />
+    </AdminLayout>
+  ),
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   checkoutRoute,
@@ -1071,6 +1135,12 @@ const routeTree = rootRoute.addChildren([
   termsRoute,
   cartRoute,
   blogRoute,
+  adminLoginRoute,
+  adminDashboardRoute,
+  adminOrdersRoute,
+  adminCustomersRoute,
+  adminProductsRoute,
+  adminAnalyticsRoute,
 ]);
 
 const router = createRouter({ routeTree });

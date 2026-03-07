@@ -37,7 +37,7 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center mb-4">
               <img
-                src="/assets/generated/soltrek-logo-transparent.dim_400x200.png"
+                src="/assets/generated/soltrek-logo-transparent.dim_400x400.png"
                 alt="SolTrek logo"
                 className="h-14 w-auto object-contain brightness-0 invert"
               />
