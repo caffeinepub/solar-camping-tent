@@ -10,7 +10,7 @@ const footerLinks = {
   Company: [
     { label: "About Us", to: "/about" },
     { label: "Contact", to: "/contact" },
-    { label: "Blog", to: "#" },
+    { label: "Blog", to: "/blog" },
   ],
   Support: [
     { label: "FAQ", to: "/contact#faq" },
@@ -35,15 +35,12 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-14">
           {/* Brand col */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center mb-4">
               <img
-                src="/assets/uploads/WhatsApp-Image-2026-03-06-at-10.39.20-PM-1.jpeg"
+                src="/assets/generated/soltrek-logo-transparent.dim_400x200.png"
                 alt="SolTrek logo"
-                className="w-10 h-10 object-contain rounded-md"
+                className="h-14 w-auto object-contain brightness-0 invert"
               />
-              <span className="font-display font-black text-xl text-white">
-                SolTrek
-              </span>
             </div>
             <p className="text-white/55 text-sm leading-relaxed mb-4">
               Solar-powered camping gear for the modern adventurer. Never run

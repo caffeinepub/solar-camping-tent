@@ -414,7 +414,7 @@ export default function ShopPage() {
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-forest-dark/80 via-forest-dark/50 to-transparent" />
-        <div className="relative h-full container max-w-6xl mx-auto px-4 sm:px-6 flex flex-col justify-center pt-16">
+        <div className="relative h-full container max-w-6xl mx-auto px-4 sm:px-6 flex flex-col justify-center pt-20">
           <p className="text-amber-brand font-black text-xs tracking-[0.2em] uppercase mb-2">
             SolTrek Store
           </p>

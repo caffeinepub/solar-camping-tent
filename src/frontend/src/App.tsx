@@ -41,6 +41,7 @@ import WhatsAppButton from "./components/WhatsAppButton";
 import { CartProvider } from "./contexts/CartContext";
 import { useActor } from "./hooks/useActor";
 import AboutPage from "./pages/AboutPage";
+import BlogPage from "./pages/BlogPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import ContactPage from "./pages/ContactPage";
@@ -1047,6 +1048,16 @@ const cartRoute = createRoute({
   ),
 });
 
+const blogRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/blog",
+  component: () => (
+    <PageLayout>
+      <BlogPage />
+    </PageLayout>
+  ),
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   checkoutRoute,
@@ -1059,6 +1070,7 @@ const routeTree = rootRoute.addChildren([
   privacyRoute,
   termsRoute,
   cartRoute,
+  blogRoute,
 ]);
 
 const router = createRouter({ routeTree });

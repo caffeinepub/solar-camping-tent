@@ -7,6 +7,7 @@ import { useCart } from "../contexts/CartContext";
 
 const NAV_LINKS = [
   { label: "Shop", to: "/shop" },
+  { label: "Blog", to: "/blog" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
@@ -36,7 +37,7 @@ export default function Navbar() {
           : "bg-transparent"
       }`}
     >
-      <nav className="container max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <nav className="container max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-20">
         {/* Logo */}
         <Link
           to="/"
@@ -44,17 +45,10 @@ export default function Navbar() {
           data-ocid="nav.link.1"
         >
           <img
-            src="/assets/uploads/WhatsApp-Image-2026-03-06-at-10.39.20-PM-1.jpeg"
+            src="/assets/generated/soltrek-logo-transparent.dim_400x200.png"
             alt="SolTrek logo"
-            className="w-10 h-10 object-contain rounded-md"
+            className="h-14 w-auto object-contain"
           />
-          <span
-            className={`font-display font-black text-xl tracking-tight transition-colors ${
-              solidBg ? "text-forest-dark" : "text-white"
-            }`}
-          >
-            SolTrek
-          </span>
         </Link>
 
         {/* Desktop nav */}
