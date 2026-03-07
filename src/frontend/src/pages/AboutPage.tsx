@@ -10,11 +10,11 @@ function usePageTitle(title: string) {
 }
 
 const TEAM_MEMBERS = [
-  { name: "Vikram Reddy", role: "Co-Founder & CEO", initials: "VR" },
-  { name: "Sanya Kapoor", role: "Co-Founder & Head of Design", initials: "SK" },
-  { name: "Rajan Pillai", role: "Co-Founder & CTO", initials: "RP" },
-  { name: "Ananya Bose", role: "Co-Founder & Operations", initials: "AB" },
-  { name: "Deepak Verma", role: "Co-Founder & Marketing", initials: "DV" },
+  { name: "Mitesh Kumar", role: "Co-Founder & CEO", initials: "MK" },
+  { name: "Biswajit Das", role: "Co-Founder & Head of Design", initials: "BD" },
+  { name: "Sailesh Samal", role: "Co-Founder & CTO", initials: "SS" },
+  { name: "Sarthak Dash", role: "Co-Founder & Operations", initials: "SD" },
+  { name: "Siddharth Goutham", role: "Co-Founder & Marketing", initials: "SG" },
 ];
 
 const CUSTOMER_PROMISES = [
