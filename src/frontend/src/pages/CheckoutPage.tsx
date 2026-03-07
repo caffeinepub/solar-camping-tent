@@ -1169,7 +1169,25 @@ function SuccessState({
 export default function CheckoutPage() {
   const searchParams = new URLSearchParams(window.location.search);
   const planId = searchParams.get("plan") ?? "duo";
-  const plan = PLANS[planId] ?? PLANS.duo;
+  const cartTotal = searchParams.get("total");
+  const cartLabel = searchParams.get("label");
+
+  // If coming from cart, build a dynamic plan from the actual cart total
+  const plan: Plan =
+    planId === "cart" && cartTotal
+      ? {
+          id: "cart",
+          name: cartLabel ?? "Cart",
+          price: Number(cartTotal),
+          displayPrice: `₹${Number(cartTotal).toLocaleString("en-IN")}`,
+          features: [
+            "All items from your cart",
+            "Free shipping across India",
+            "1-year warranty",
+            "7-day returns",
+          ],
+        }
+      : (PLANS[planId] ?? PLANS.duo);
   const { actor } = useActor();
 
   const [form, setForm] = useState<FormData>({

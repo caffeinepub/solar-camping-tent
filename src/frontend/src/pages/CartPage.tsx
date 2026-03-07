@@ -187,7 +187,14 @@ export default function CartPage() {
               data-ocid="cart.primary_button"
               size="lg"
               onClick={() =>
-                navigate({ to: "/checkout", search: { plan: "solo" } })
+                navigate({
+                  to: "/checkout",
+                  search: {
+                    plan: "cart",
+                    total: totalPrice,
+                    label: `${totalItems} item${totalItems !== 1 ? "s" : ""}`,
+                  },
+                })
               }
               className="w-full btn-amber-stamp bg-amber-brand hover:bg-amber-dark text-accent-foreground font-bold text-base transition-all duration-150 active:scale-[0.98]"
             >

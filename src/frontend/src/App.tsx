@@ -957,6 +957,17 @@ const homeRoute = createRoute({
 const checkoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/checkout",
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): {
+    plan: string;
+    total?: number;
+    label?: string;
+  } => ({
+    plan: (search.plan as string) ?? "duo",
+    ...(search.total !== undefined && { total: Number(search.total) }),
+    ...(search.label !== undefined && { label: search.label as string }),
+  }),
   component: () => (
     <>
       <CheckoutPage />
