@@ -31,7 +31,7 @@ import {
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 
-/* ─── Indian States ─────────────────────────────────────────── */
+/* ─── Indian States & Cities ─────────────────────────────────── */
 const INDIAN_STATES = [
   "Andhra Pradesh",
   "Arunachal Pradesh",
@@ -70,6 +70,443 @@ const INDIAN_STATES = [
   "Lakshadweep",
   "Puducherry",
 ];
+
+const CITIES_BY_STATE: Record<string, string[]> = {
+  "Andhra Pradesh": [
+    "Visakhapatnam",
+    "Vijayawada",
+    "Guntur",
+    "Nellore",
+    "Kurnool",
+    "Rajahmundry",
+    "Tirupati",
+    "Kakinada",
+    "Kadapa",
+    "Anantapur",
+  ],
+  "Arunachal Pradesh": [
+    "Itanagar",
+    "Naharlagun",
+    "Pasighat",
+    "Tezpur",
+    "Bomdila",
+    "Ziro",
+    "Along",
+    "Tezu",
+    "Roing",
+    "Aalo",
+  ],
+  Assam: [
+    "Guwahati",
+    "Silchar",
+    "Dibrugarh",
+    "Jorhat",
+    "Nagaon",
+    "Tinsukia",
+    "Tezpur",
+    "Bongaigaon",
+    "Dhubri",
+    "Diphu",
+  ],
+  Bihar: [
+    "Patna",
+    "Gaya",
+    "Bhagalpur",
+    "Muzaffarpur",
+    "Purnia",
+    "Darbhanga",
+    "Bihar Sharif",
+    "Arrah",
+    "Begusarai",
+    "Katihar",
+  ],
+  Chhattisgarh: [
+    "Raipur",
+    "Bhilai",
+    "Korba",
+    "Bilaspur",
+    "Durg",
+    "Rajnandgaon",
+    "Jagdalpur",
+    "Ambikapur",
+    "Raigarh",
+    "Chirmiri",
+  ],
+  Goa: [
+    "Panaji",
+    "Margao",
+    "Vasco da Gama",
+    "Mapusa",
+    "Ponda",
+    "Bicholim",
+    "Curchorem",
+    "Sanquelim",
+    "Cuncolim",
+    "Canacona",
+  ],
+  Gujarat: [
+    "Ahmedabad",
+    "Surat",
+    "Vadodara",
+    "Rajkot",
+    "Bhavnagar",
+    "Jamnagar",
+    "Gandhinagar",
+    "Junagadh",
+    "Anand",
+    "Navsari",
+    "Morbi",
+    "Nadiad",
+  ],
+  Haryana: [
+    "Faridabad",
+    "Gurugram",
+    "Panipat",
+    "Ambala",
+    "Yamunanagar",
+    "Rohtak",
+    "Hisar",
+    "Karnal",
+    "Sonipat",
+    "Panchkula",
+  ],
+  "Himachal Pradesh": [
+    "Shimla",
+    "Dharamshala",
+    "Solan",
+    "Mandi",
+    "Palampur",
+    "Baddi",
+    "Nahan",
+    "Paonta Sahib",
+    "Sundarnagar",
+    "Chamba",
+  ],
+  Jharkhand: [
+    "Ranchi",
+    "Jamshedpur",
+    "Dhanbad",
+    "Bokaro",
+    "Deoghar",
+    "Phusro",
+    "Hazaribagh",
+    "Giridih",
+    "Ramgarh",
+    "Medininagar",
+  ],
+  Karnataka: [
+    "Bengaluru",
+    "Mysuru",
+    "Hubli",
+    "Mangaluru",
+    "Belagavi",
+    "Davanagere",
+    "Ballari",
+    "Vijayapura",
+    "Shivamogga",
+    "Tumakuru",
+    "Udupi",
+    "Hassan",
+  ],
+  Kerala: [
+    "Thiruvananthapuram",
+    "Kochi",
+    "Kozhikode",
+    "Thrissur",
+    "Kollam",
+    "Alappuzha",
+    "Palakkad",
+    "Kannur",
+    "Kottayam",
+    "Malappuram",
+  ],
+  "Madhya Pradesh": [
+    "Indore",
+    "Bhopal",
+    "Jabalpur",
+    "Gwalior",
+    "Ujjain",
+    "Sagar",
+    "Dewas",
+    "Satna",
+    "Ratlam",
+    "Rewa",
+    "Murwara",
+    "Singrauli",
+  ],
+  Maharashtra: [
+    "Mumbai",
+    "Pune",
+    "Nagpur",
+    "Nashik",
+    "Thane",
+    "Aurangabad",
+    "Solapur",
+    "Amravati",
+    "Nanded",
+    "Kolhapur",
+    "Sangli",
+    "Jalgaon",
+    "Akola",
+  ],
+  Manipur: [
+    "Imphal",
+    "Thoubal",
+    "Bishnupur",
+    "Churachandpur",
+    "Kakching",
+    "Senapati",
+    "Ukhrul",
+    "Moreh",
+    "Jiribam",
+    "Kangpokpi",
+  ],
+  Meghalaya: [
+    "Shillong",
+    "Tura",
+    "Nongstoin",
+    "Jowai",
+    "Baghmara",
+    "Williamnagar",
+    "Resubelpara",
+    "Ampati",
+    "Mawkyrwat",
+    "Mairang",
+  ],
+  Mizoram: [
+    "Aizawl",
+    "Lunglei",
+    "Champhai",
+    "Serchhip",
+    "Kolasib",
+    "Lawngtlai",
+    "Mamit",
+    "Saiha",
+    "Hnahthial",
+    "Khawzawl",
+  ],
+  Nagaland: [
+    "Kohima",
+    "Dimapur",
+    "Mokokchung",
+    "Tuensang",
+    "Wokha",
+    "Zunheboto",
+    "Phek",
+    "Mon",
+    "Longleng",
+    "Kiphire",
+  ],
+  Odisha: [
+    "Bhubaneswar",
+    "Cuttack",
+    "Rourkela",
+    "Brahmapur",
+    "Sambalpur",
+    "Puri",
+    "Balasore",
+    "Bhadrak",
+    "Baripada",
+    "Jharsuguda",
+  ],
+  Punjab: [
+    "Ludhiana",
+    "Amritsar",
+    "Jalandhar",
+    "Patiala",
+    "Bathinda",
+    "Mohali",
+    "Pathankot",
+    "Hoshiarpur",
+    "Batala",
+    "Moga",
+  ],
+  Rajasthan: [
+    "Jaipur",
+    "Jodhpur",
+    "Kota",
+    "Bikaner",
+    "Ajmer",
+    "Udaipur",
+    "Bhilwara",
+    "Alwar",
+    "Bharatpur",
+    "Sikar",
+    "Pali",
+    "Sri Ganganagar",
+  ],
+  Sikkim: [
+    "Gangtok",
+    "Namchi",
+    "Gyalshing",
+    "Mangan",
+    "Ravangla",
+    "Singtam",
+    "Jorethang",
+    "Rangpo",
+    "Rongli",
+    "Yuksom",
+  ],
+  "Tamil Nadu": [
+    "Chennai",
+    "Coimbatore",
+    "Madurai",
+    "Tiruchirappalli",
+    "Salem",
+    "Tirunelveli",
+    "Tiruppur",
+    "Vellore",
+    "Erode",
+    "Thoothukudi",
+    "Dindigul",
+    "Thanjavur",
+  ],
+  Telangana: [
+    "Hyderabad",
+    "Warangal",
+    "Nizamabad",
+    "Karimnagar",
+    "Ramagundam",
+    "Khammam",
+    "Mahbubnagar",
+    "Nalgonda",
+    "Adilabad",
+    "Suryapet",
+  ],
+  Tripura: [
+    "Agartala",
+    "Dharmanagar",
+    "Udaipur",
+    "Kailashahar",
+    "Belonia",
+    "Khowai",
+    "Ambassa",
+    "Sabroom",
+    "Sonamura",
+    "Bishalgarh",
+  ],
+  "Uttar Pradesh": [
+    "Lucknow",
+    "Kanpur",
+    "Agra",
+    "Varanasi",
+    "Meerut",
+    "Allahabad",
+    "Bareilly",
+    "Aligarh",
+    "Moradabad",
+    "Ghaziabad",
+    "Noida",
+    "Mathura",
+    "Firozabad",
+    "Saharanpur",
+  ],
+  Uttarakhand: [
+    "Dehradun",
+    "Haridwar",
+    "Roorkee",
+    "Haldwani",
+    "Rudrapur",
+    "Kashipur",
+    "Rishikesh",
+    "Kotdwar",
+    "Mussoorie",
+    "Almora",
+  ],
+  "West Bengal": [
+    "Kolkata",
+    "Howrah",
+    "Durgapur",
+    "Asansol",
+    "Siliguri",
+    "Malda",
+    "Bardhaman",
+    "Kharagpur",
+    "Haldia",
+    "Raiganj",
+  ],
+  "Andaman and Nicobar Islands": [
+    "Port Blair",
+    "Car Nicobar",
+    "Diglipur",
+    "Rangat",
+    "Mayabunder",
+    "Havelock Island",
+    "Neil Island",
+    "Bambooflat",
+    "Garacharma",
+    "Tirur",
+  ],
+  Chandigarh: ["Chandigarh"],
+  "Dadra and Nagar Haveli and Daman and Diu": [
+    "Daman",
+    "Diu",
+    "Silvassa",
+    "Amli",
+    "Khanvel",
+    "Naroli",
+  ],
+  Delhi: [
+    "New Delhi",
+    "Central Delhi",
+    "North Delhi",
+    "South Delhi",
+    "East Delhi",
+    "West Delhi",
+    "North East Delhi",
+    "North West Delhi",
+    "South West Delhi",
+    "Shahdara",
+  ],
+  "Jammu and Kashmir": [
+    "Srinagar",
+    "Jammu",
+    "Anantnag",
+    "Sopore",
+    "Baramulla",
+    "Udhampur",
+    "Kathua",
+    "Poonch",
+    "Rajouri",
+    "Leh",
+  ],
+  Ladakh: [
+    "Leh",
+    "Kargil",
+    "Nubra",
+    "Zanskar",
+    "Drass",
+    "Padum",
+    "Nyoma",
+    "Durbuk",
+    "Khaltse",
+    "Sankoo",
+  ],
+  Lakshadweep: [
+    "Kavaratti",
+    "Agatti",
+    "Amini",
+    "Andrott",
+    "Kalpeni",
+    "Kadmat",
+    "Kiltan",
+    "Chetlat",
+    "Bitra",
+    "Minicoy",
+  ],
+  Puducherry: [
+    "Puducherry",
+    "Karaikal",
+    "Mahe",
+    "Yanam",
+    "Ozhukarai",
+    "Villianur",
+    "Ariyankuppam",
+    "Nettapakkam",
+    "Mannadipet",
+    "Bahour",
+  ],
+};
 
 /* ─── Plan Data ──────────────────────────────────────────────── */
 type Plan = {
@@ -1268,34 +1705,6 @@ function CustomerForm({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="space-y-1.5">
             <Label
-              htmlFor="city"
-              className="text-sm font-semibold text-foreground"
-            >
-              City *
-            </Label>
-            <Input
-              id="city"
-              data-ocid="checkout.city_input"
-              placeholder="Mumbai"
-              value={form.city}
-              onChange={(e) => set("city")(e.target.value)}
-              onBlur={touch("city")}
-              autoComplete="address-level2"
-              required
-              className={
-                fieldError("city")
-                  ? "border-red-500 focus-visible:ring-red-400"
-                  : ""
-              }
-            />
-            {fieldError("city") && (
-              <p className="text-xs text-red-500 mt-0.5">
-                {fieldError("city")}
-              </p>
-            )}
-          </div>
-          <div className="space-y-1.5">
-            <Label
               htmlFor="state"
               className="text-sm font-semibold text-foreground"
             >
@@ -1304,8 +1713,8 @@ function CustomerForm({
             <Select
               value={form.state}
               onValueChange={(val) => {
-                set("state")(val);
-                setTouched((prev) => ({ ...prev, state: true }));
+                setForm({ ...form, state: val, city: "" });
+                setTouched((prev) => ({ ...prev, state: true, city: false }));
               }}
             >
               <SelectTrigger
@@ -1326,6 +1735,46 @@ function CustomerForm({
             {fieldError("state") && (
               <p className="text-xs text-red-500 mt-0.5">
                 {fieldError("state")}
+              </p>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="city"
+              className="text-sm font-semibold text-foreground"
+            >
+              City *
+            </Label>
+            <Select
+              value={form.city}
+              onValueChange={(val) => {
+                set("city")(val);
+                setTouched((prev) => ({ ...prev, city: true }));
+              }}
+              disabled={!form.state}
+            >
+              <SelectTrigger
+                id="city"
+                data-ocid="checkout.city_select"
+                className={`w-full ${fieldError("city") ? "border-red-500 focus:ring-red-400" : ""} ${!form.state ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                <SelectValue
+                  placeholder={
+                    form.state ? "Select city" : "Select state first"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent className="max-h-72 overflow-y-auto">
+                {(CITIES_BY_STATE[form.state] ?? []).map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {fieldError("city") && (
+              <p className="text-xs text-red-500 mt-0.5">
+                {fieldError("city")}
               </p>
             )}
           </div>
