@@ -1,15 +1,16 @@
 import type { ProductInventory } from "@/backend";
-import { useActor } from "@/hooks/useActor";
 import {
   AlertCircle,
   Check,
   Download,
   Package,
   Pencil,
+  RefreshCw,
   Upload,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useAdminActor } from "../hooks/useAdminActor";
 import { exportToExcel, parseCSVImport } from "../utils/exportImport";
 
 function getStockStatus(stock: number): {
@@ -41,7 +42,7 @@ function formatCurrency(amount: number): string {
 }
 
 export default function AdminProductsPage() {
-  const { actor, isFetching } = useActor();
+  const { actor, actorError } = useAdminActor();
   const [products, setProducts] = useState<ProductInventory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -52,14 +53,20 @@ export default function AdminProductsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!actor || isFetching) return;
+    if (actorError) {
+      setLoading(false);
+      setError("Unable to connect to the backend. Please refresh the page.");
+      return;
+    }
+    if (!actor) return;
     setLoading(true);
+    setError("");
     actor
       .getProductInventory()
       .then(setProducts)
-      .catch(() => setError("Failed to load inventory."))
+      .catch(() => setError("Failed to load inventory. Try refreshing."))
       .finally(() => setLoading(false));
-  }, [actor, isFetching]);
+  }, [actor, actorError]);
 
   // Auto-dismiss import success message after 3 seconds
   useEffect(() => {
@@ -247,7 +254,15 @@ export default function AdminProductsPage() {
             className="p-8 text-center"
           >
             <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
-            <p className="text-red-600 text-sm font-medium">{error}</p>
+            <p className="text-red-600 text-sm font-medium mb-4">{error}</p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Retry
+            </button>
           </div>
         ) : products.length === 0 ? (
           <div

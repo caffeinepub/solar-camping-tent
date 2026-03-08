@@ -1,10 +1,10 @@
 import type { AdminStats, OrderView } from "@/backend";
-import { useActor } from "@/hooks/useActor";
 import {
   AlertCircle,
   ArrowUpRight,
   IndianRupee,
   Package,
+  RefreshCw,
   ShoppingCart,
   Users,
 } from "lucide-react";
@@ -18,6 +18,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useAdminActor } from "../hooks/useAdminActor";
 
 const STATUS_COLORS: Record<string, string> = {
   Pending: "bg-amber-100 text-amber-700 border border-amber-200",
@@ -35,23 +36,37 @@ function formatCurrency(amount: number): string {
 }
 
 export default function AdminDashboardPage() {
-  const { actor, isFetching } = useActor();
+  const { actor, actorError } = useAdminActor();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [orders, setOrders] = useState<OrderView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [fetchKey, setFetchKey] = useState(0);
 
-  useEffect(() => {
-    if (!actor || isFetching) return;
+  const retry = () => {
+    setError("");
     setLoading(true);
+    setFetchKey((k) => k + 1);
+  };
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: fetchKey is an intentional manual retry trigger
+  useEffect(() => {
+    if (actorError) {
+      setLoading(false);
+      setError("Unable to connect to the backend. Please refresh the page.");
+      return;
+    }
+    if (!actor) return;
+    setLoading(true);
+    setError("");
     Promise.all([actor.getAdminStats(), actor.getAllOrders()])
       .then(([s, o]) => {
         setStats(s);
         setOrders(o);
       })
-      .catch(() => setError("Failed to load dashboard data."))
+      .catch(() => setError("Failed to load dashboard data. Try refreshing."))
       .finally(() => setLoading(false));
-  }, [actor, isFetching]);
+  }, [actor, actorError, fetchKey]);
 
   // Compute chart data from orders
   const chartData = [
@@ -144,7 +159,15 @@ export default function AdminDashboardPage() {
         className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center"
       >
         <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
-        <p className="text-red-600 font-medium">{error}</p>
+        <p className="text-red-600 font-medium mb-4">{error}</p>
+        <button
+          type="button"
+          onClick={retry}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Retry
+        </button>
       </div>
     );
   }

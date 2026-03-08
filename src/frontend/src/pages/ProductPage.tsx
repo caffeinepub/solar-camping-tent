@@ -82,7 +82,7 @@ const GALLERY_IMAGES = [
 const SPECS = [
   { label: "Capacity", value: "1 Person" },
   { label: "Weight", value: "1.8 kg" },
-  { label: "Solar Panel", value: "1W Monocrystalline" },
+  { label: "Solar Panel", value: "10W Monocrystalline" },
   { label: "USB Output", value: "5V/1A (Standard USB-A)" },
   { label: "Fabric", value: "210D Ripstop Nylon" },
   { label: "Waterproof Rating", value: "2000mm HH" },
@@ -96,7 +96,7 @@ const KEY_BENEFITS = [
   {
     icon: "⚡",
     title: "Never Run Out of Battery",
-    desc: "The integrated 1W solar panel on the rain fly harvests sunlight all day — charge your phone, GPS, or headlamp directly from the sun, no power bank needed.",
+    desc: "The integrated 10W solar panel on the rain fly harvests sunlight all day — charge your phone, GPS, or headlamp directly from the sun, no power bank needed.",
   },
   {
     icon: "🌧️",
@@ -127,7 +127,7 @@ const KEY_BENEFITS = [
 
 const BOX_CONTENTS = [
   "1× SolTrek Solar Tent Body",
-  "1× Rain Fly with Integrated 1W Solar Panel",
+  "1× Rain Fly with Integrated 10W Solar Panel",
   "2× Fiberglass Tent Poles",
   "6× Aluminium Tent Pegs",
   "1× Guylines (pre-attached)",
@@ -542,7 +542,7 @@ function ReviewsSection() {
 
 /* ─── ProductPage ────────────────────────────────────────────── */
 export default function ProductPage() {
-  usePageTitle("SolTrek Solo Solar Camping Tent - ₹2,299 | Buy Online India");
+  usePageTitle("SolTrek Solo Solar Camping Tent - ₹9,999 | Buy Online India");
 
   const navigate = useNavigate();
   const { addItem } = useCart();
@@ -562,7 +562,7 @@ export default function ProductPage() {
     addItem({
       productId: PRODUCT_ID,
       productName: "SolTrek Solo Solar Camping Tent",
-      price: 2299,
+      price: 9999,
       image: "/assets/generated/product-solar-tent-main.dim_800x800.jpg",
       quantity,
     });
@@ -731,7 +731,7 @@ export default function ProductPage() {
 
             {/* Short description */}
             <p className="text-muted-foreground text-sm leading-relaxed border-t border-border pt-4">
-              Adventure without limits. Built for solo trekkers with a 1W
+              Adventure without limits. Built for solo trekkers with a 10W
               monocrystalline solar panel, waterproof ripstop nylon, and
               60-second setup. Charges your phone directly from the sun — no
               power bank required.
@@ -758,8 +758,8 @@ export default function ProductPage() {
               </strong>{" "}
               is engineered for solo trekkers and weekend adventurers who refuse
               to let a dead battery end the journey. With an integrated{" "}
-              <strong className="text-foreground">1W solar panel</strong> on the
-              rain fly, you can charge your phone, GPS, or headlamp directly
+              <strong className="text-foreground">10W solar panel</strong> on
+              the rain fly, you can charge your phone, GPS, or headlamp directly
               from the sun — no power banks required.
             </p>
             <p className="text-muted-foreground leading-relaxed text-base sm:text-lg mt-4">
@@ -864,7 +864,7 @@ export default function ProductPage() {
               {
                 step: "01",
                 title: "Sunlight Hits the Panel",
-                desc: "The 1W monocrystalline solar panel on the rain fly absorbs sunlight throughout the day, converting it to DC electricity with up to 23% efficiency.",
+                desc: "The 10W monocrystalline solar panel on the rain fly absorbs sunlight throughout the day, converting it to DC electricity with up to 23% efficiency.",
               },
               {
                 step: "02",
@@ -899,10 +899,11 @@ export default function ProductPage() {
           <div className="bg-forest rounded-2xl p-6 text-white">
             <p className="font-semibold leading-relaxed">
               💡 <strong>Real-world performance:</strong> In 6–8 hours of direct
-              Indian summer sun, the 1W panel generates approximately 6–8 Wh of
-              energy — enough to charge a 4000mAh smartphone once fully. On
-              partially cloudy days, expect 20–30% efficiency. Place the rain
-              fly at an angle facing south for maximum power generation.
+              Indian summer sun, the 10W panel generates approximately 60–80 Wh
+              of energy — enough to charge a 4000mAh smartphone multiple times
+              fully. On partially cloudy days, expect 20–30% efficiency. Place
+              the rain fly at an angle facing south for maximum power
+              generation.
             </p>
           </div>
         </div>

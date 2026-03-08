@@ -1,15 +1,22 @@
 import { useNavigate } from "@tanstack/react-router";
 import {
+  AlertCircle,
   BarChart3,
   LayoutDashboard,
+  Loader2,
   LogOut,
   Menu,
   Package,
+  RefreshCw,
   ShoppingCart,
   Users,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import {
+  AdminActorProvider,
+  useAdminActorContext,
+} from "../hooks/AdminActorContext";
 import { isAuthenticated, logout } from "../hooks/useAdminAuth";
 
 interface AdminLayoutProps {
@@ -50,7 +57,7 @@ const navItems = [
   },
 ];
 
-export default function AdminLayout({
+function AdminLayoutInner({
   children,
   pageTitle = "Admin Panel",
 }: AdminLayoutProps) {
@@ -199,8 +206,62 @@ export default function AdminLayout({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        <main className="flex-1 p-4 sm:p-6">
+          <AdminContentArea>{children}</AdminContentArea>
+        </main>
       </div>
     </div>
+  );
+}
+
+/* ── Inner component that reads actor state and shows loading/error ── */
+function AdminContentArea({ children }: { children: React.ReactNode }) {
+  const { actor, actorError, retryActor } = useAdminActorContext();
+
+  if (actorError) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center max-w-sm w-full">
+          <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-3" />
+          <p className="text-red-700 font-semibold mb-1">Connection Failed</p>
+          <p className="text-red-500 text-sm mb-5">
+            Unable to connect to the backend. Please check your connection and
+            try again.
+          </p>
+          <button
+            type="button"
+            onClick={retryActor}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!actor) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+          <p className="text-slate-500 text-sm font-medium">
+            Connecting to backend…
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
+/* ── AdminLayout wraps everything in AdminActorProvider ── */
+export default function AdminLayout({ children, pageTitle }: AdminLayoutProps) {
+  return (
+    <AdminActorProvider>
+      <AdminLayoutInner pageTitle={pageTitle}>{children}</AdminLayoutInner>
+    </AdminActorProvider>
   );
 }

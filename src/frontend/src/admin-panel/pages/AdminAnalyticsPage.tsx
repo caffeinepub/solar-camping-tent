@@ -1,6 +1,11 @@
 import type { OrderView } from "@/backend";
-import { useActor } from "@/hooks/useActor";
-import { AlertCircle, Download, IndianRupee, TrendingUp } from "lucide-react";
+import {
+  AlertCircle,
+  Download,
+  IndianRupee,
+  RefreshCw,
+  TrendingUp,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Bar,
@@ -13,6 +18,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useAdminActor } from "../hooks/useAdminActor";
 import { exportToExcel } from "../utils/exportImport";
 
 function formatCurrency(amount: number): string {
@@ -105,20 +111,26 @@ function generateAcquisitionTrend(): Array<{
 }
 
 export default function AdminAnalyticsPage() {
-  const { actor, isFetching } = useActor();
+  const { actor, actorError } = useAdminActor();
   const [orders, setOrders] = useState<OrderView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!actor || isFetching) return;
+    if (actorError) {
+      setLoading(false);
+      setError("Unable to connect to the backend. Please refresh the page.");
+      return;
+    }
+    if (!actor) return;
     setLoading(true);
+    setError("");
     actor
       .getAllOrders()
       .then(setOrders)
-      .catch(() => setError("Failed to load analytics data."))
+      .catch(() => setError("Failed to load analytics data. Try refreshing."))
       .finally(() => setLoading(false));
-  }, [actor, isFetching]);
+  }, [actor, actorError]);
 
   const revenue = computeRevenue(orders);
   const dailyRevenue = generateDailyRevenue(orders);
@@ -182,7 +194,15 @@ export default function AdminAnalyticsPage() {
         className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center"
       >
         <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
-        <p className="text-red-600 font-medium">{error}</p>
+        <p className="text-red-600 font-medium mb-4">{error}</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Retry
+        </button>
       </div>
     );
   }

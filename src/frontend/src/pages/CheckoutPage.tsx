@@ -521,11 +521,11 @@ const PLANS: Record<string, Plan> = {
   solo: {
     id: "solo",
     name: "Solo",
-    price: 2299,
-    displayPrice: "₹2,299",
+    price: 9999,
+    displayPrice: "₹9,999",
     features: [
       "1-person capacity",
-      "1W solar panel",
+      "10W solar panel",
       "USB-A charging port",
       "2000mm waterproof",
       "1.8 kg total weight",
@@ -535,11 +535,11 @@ const PLANS: Record<string, Plan> = {
   duo: {
     id: "duo",
     name: "Duo",
-    price: 3299,
-    displayPrice: "₹3,299",
+    price: 12999,
+    displayPrice: "₹12,999",
     features: [
       "2-person capacity",
-      "2W solar panel",
+      "Dual USB-A ports",
       "2× USB-A ports",
       "2000mm waterproof",
       "2.4 kg total weight",
@@ -550,11 +550,11 @@ const PLANS: Record<string, Plan> = {
   family: {
     id: "family",
     name: "Pro",
-    price: 4299,
-    displayPrice: "₹4,299",
+    price: 14999,
+    displayPrice: "₹14,999",
     features: [
       "2-person capacity",
-      "5W solar panel + 10000mAh battery",
+      "10000mAh battery",
       "3× USB-A ports",
       "2000mm waterproof + IPX6 fly",
       "LED interior lighting",

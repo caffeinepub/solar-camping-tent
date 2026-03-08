@@ -159,9 +159,9 @@ function Hero() {
         {/* Stats bar */}
         <div className="mt-14 inline-flex flex-wrap gap-0 justify-center rounded-2xl bg-white/8 border border-white/12 backdrop-blur-sm overflow-hidden divide-x divide-white/10">
           {[
-            { value: "1W", label: "Solar Panel" },
+            { value: "10W", label: "Solar Panel" },
             { value: "1.8kg", label: "Total Weight" },
-            { value: "₹2,299", label: "Launch Price" },
+            { value: "₹9,999", label: "Launch Price" },
             { value: "60s", label: "Setup Time" },
           ].map((stat) => (
             <div key={stat.label} className="text-center px-6 py-4">
@@ -189,7 +189,7 @@ const benefits = [
   {
     icon: Sun,
     title: "Built-in Solar Panel",
-    desc: "1W monocrystalline solar panel charges your phone directly from sunlight. No power banks required.",
+    desc: "10W monocrystalline solar panel charges your phone directly from sunlight. No power banks required.",
   },
   {
     icon: CloudRain,
@@ -273,7 +273,7 @@ const steps = [
     num: "01",
     icon: Sun,
     title: "Collect",
-    desc: "The integrated 1W monocrystalline solar panel on the rain fly absorbs sunlight throughout the day.",
+    desc: "The integrated 10W monocrystalline solar panel on the rain fly absorbs sunlight throughout the day.",
   },
   {
     num: "02",
@@ -573,12 +573,12 @@ const pricingTiers: PricingTier[] = [
   {
     id: "solo",
     name: "Solo",
-    price: "₹2,299",
+    price: "₹9,999",
     ocid: "pricing.item.1",
     btnOcid: "pricing.solo.button",
     features: [
       "1-person capacity",
-      "1W solar panel",
+      "10W solar panel",
       "USB-A charging port",
       "2000mm waterproof",
       "1.8 kg total weight",
@@ -588,7 +588,7 @@ const pricingTiers: PricingTier[] = [
   {
     id: "duo",
     name: "Duo",
-    price: "₹3,299",
+    price: "₹12,999",
     recommended: true,
     ocid: "pricing.item.2",
     btnOcid: "pricing.duo.button",
@@ -605,7 +605,7 @@ const pricingTiers: PricingTier[] = [
   {
     id: "family",
     name: "Pro",
-    price: "₹4,299",
+    price: "₹14,999",
     ocid: "pricing.item.3",
     btnOcid: "pricing.pro.button",
     features: [
