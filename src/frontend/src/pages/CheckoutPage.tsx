@@ -521,8 +521,8 @@ const PLANS: Record<string, Plan> = {
   solo: {
     id: "solo",
     name: "Solo",
-    price: 7999,
-    displayPrice: "₹7,999",
+    price: 2299,
+    displayPrice: "₹2,299",
     features: [
       "1-person capacity",
       "1W solar panel",
@@ -535,8 +535,8 @@ const PLANS: Record<string, Plan> = {
   duo: {
     id: "duo",
     name: "Duo",
-    price: 9999,
-    displayPrice: "₹9,999",
+    price: 3299,
+    displayPrice: "₹3,299",
     features: [
       "2-person capacity",
       "2W solar panel",
@@ -550,8 +550,8 @@ const PLANS: Record<string, Plan> = {
   family: {
     id: "family",
     name: "Pro",
-    price: 12999,
-    displayPrice: "₹12,999",
+    price: 4299,
+    displayPrice: "₹4,299",
     features: [
       "2-person capacity",
       "5W solar panel + 10000mAh battery",

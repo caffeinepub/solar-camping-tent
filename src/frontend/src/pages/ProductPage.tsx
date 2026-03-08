@@ -542,7 +542,7 @@ function ReviewsSection() {
 
 /* ─── ProductPage ────────────────────────────────────────────── */
 export default function ProductPage() {
-  usePageTitle("SolTrek Solo Solar Camping Tent - ₹7,999 | Buy Online India");
+  usePageTitle("SolTrek Solo Solar Camping Tent - ₹2,299 | Buy Online India");
 
   const navigate = useNavigate();
   const { addItem } = useCart();
@@ -562,7 +562,7 @@ export default function ProductPage() {
     addItem({
       productId: PRODUCT_ID,
       productName: "SolTrek Solo Solar Camping Tent",
-      price: 7999,
+      price: 2299,
       image: "/assets/generated/product-solar-tent-main.dim_800x800.jpg",
       quantity,
     });
@@ -644,13 +644,13 @@ export default function ProductPage() {
             <div className="bg-forest/5 rounded-2xl border border-forest/15 p-5">
               <div className="flex items-baseline gap-3 mb-2">
                 <span className="font-display font-black text-4xl text-forest">
-                  ₹7,999
+                  ₹2,299
                 </span>
                 <span className="text-muted-foreground text-lg line-through">
-                  ₹9,999
+                  ₹3,299
                 </span>
                 <span className="bg-amber-brand text-accent-foreground text-xs font-black px-2.5 py-1 rounded-full shadow-amber">
-                  Save ₹2,000 (20% OFF)
+                  Save ₹1,000 (30% OFF)
                 </span>
               </div>
               <p className="text-xs text-forest font-semibold">
@@ -1028,10 +1028,10 @@ export default function ProductPage() {
         <div className="flex items-center gap-3 max-w-lg mx-auto">
           <div>
             <div className="font-display font-black text-xl text-forest leading-none">
-              ₹7,999
+              ₹2,299
             </div>
             <div className="text-xs text-muted-foreground line-through">
-              ₹9,999
+              ₹3,299
             </div>
           </div>
           <Button
